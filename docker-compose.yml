@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: ${NODE_ENV}
+    depends_on:
+      - mongodb
+    networks:
+      - happy-network
+
+  # Optional: Local MongoDB for development
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - happy-network
+
+networks:
+  happy-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
