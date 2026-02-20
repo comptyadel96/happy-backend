@@ -69,7 +69,9 @@ export class GameGateway
         },
       });
 
-      console.log(`User ${client.data.userId} connected with socket ${client.id}`);
+      console.log(
+        `User ${client.data.userId} connected with socket ${client.id}`,
+      );
 
       // Send heartbeat response
       client.emit('connection_established', {

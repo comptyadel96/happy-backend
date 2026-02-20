@@ -3,6 +3,7 @@
 ## 5 Minutes to Running Server
 
 ### 1. Prerequisites
+
 - Node.js 18+
 - npm 9+
 - MongoDB Atlas account (or local MongoDB)
@@ -27,6 +28,7 @@ nano .env
 ```
 
 ### 3. Minimal .env Setup
+
 ```env
 DATABASE_URL="mongodb+srv://user:pass@cluster.mongodb.net/happy-backend?retryWrites=true&w=majority"
 JWT_SECRET="dev-secret-key-change-in-production"
@@ -34,6 +36,7 @@ PORT=3000
 ```
 
 ### 4. Database Setup
+
 ```bash
 # Create migrations (optional, Prisma can auto-sync for MongoDB)
 npm run prisma:migrate
@@ -46,6 +49,7 @@ npm run prisma:studio
 ```
 
 ### 5. Start Server
+
 ```bash
 # Development mode (with hot reload)
 npm run start:dev
@@ -58,6 +62,7 @@ npm run start:dev
 ## Testing the API
 
 ### 1. Register Adult User
+
 ```bash
 curl -X POST http://localhost:3000/auth/register-adult \
   -H "Content-Type: application/json" \
@@ -70,6 +75,7 @@ curl -X POST http://localhost:3000/auth/register-adult \
 ```
 
 Expected response:
+
 ```json
 {
   "user": {
@@ -84,6 +90,7 @@ Expected response:
 ```
 
 ### 2. Login
+
 ```bash
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
@@ -94,17 +101,19 @@ curl -X POST http://localhost:3000/auth/login \
 ```
 
 ### 3. Get User Profile (authenticated)
+
 ```bash
 curl -X GET http://localhost:3000/users/profile \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ### 4. Connect WebSocket (from Godot or ws client)
+
 ```javascript
 const socket = io('ws://localhost:3000/game', {
   auth: {
-    token: 'YOUR_JWT_TOKEN_HERE'
-  }
+    token: 'YOUR_JWT_TOKEN_HERE',
+  },
 });
 
 socket.on('connection_established', (data) => {
@@ -115,26 +124,29 @@ socket.on('connection_established', (data) => {
 socket.emit('item_collected', {
   levelId: 1,
   itemType: 'chocolate',
-  itemIndex: 5
+  itemIndex: 5,
 });
 
 // Complete level
 socket.emit('level_complete', {
   levelId: 1,
   score: 250,
-  timeSpent: 180
+  timeSpent: 180,
 });
 ```
 
 ## Godot Integration Example
 
 ### Install Socket.io Client for Godot
+
 Add to your `project.godot`:
+
 ```gdscript
 var socket = SocketIOClient.new()
 ```
 
 ### Connect to Backend
+
 ```gdscript
 extends Node
 
@@ -144,7 +156,7 @@ func _ready():
     # Get token from login first
     var response = await auth_login("child@example.com", "pass123")
     user_token = response["token"]
-    
+
     # Connect to WebSocket
     socket = SocketIOClient.new()
     socket.connect_to_url("ws://localhost:3000/game", {
@@ -152,7 +164,7 @@ func _ready():
             "token": user_token
         }
     })
-    
+
     socket.on("connection_established", Callable(self, "_on_connected"))
     socket.on("item_collection_success", Callable(self, "_on_item_collected"))
     socket.on("level_complete_success", Callable(self, "_on_level_completed"))
@@ -160,7 +172,7 @@ func _ready():
 
 func _on_connected(data):
     print("Connected! Socket ID: ", data["socketId"])
-    
+
 func collect_item(level_id: int, item_index: int):
     socket.emit("item_collected", {
         "levelId": level_id,
@@ -190,6 +202,7 @@ func _on_collection_failed(data):
 ### Create Child Account with Parent Link
 
 1. **Parent creates contact info:**
+
 ```bash
 curl -X POST http://localhost:3000/users/parent-contact \
   -H "Authorization: Bearer PARENT_TOKEN" \
@@ -204,6 +217,7 @@ curl -X POST http://localhost:3000/users/parent-contact \
 Response: `{ "id": "contact-id-xyz" }`
 
 2. **Register child with parent link:**
+
 ```bash
 curl -X POST http://localhost:3000/auth/register-child \
   -H "Content-Type: application/json" \
@@ -217,6 +231,7 @@ curl -X POST http://localhost:3000/auth/register-child \
 ```
 
 ### Generate Play Token (Parent Verification)
+
 ```bash
 curl -X POST http://localhost:3000/users/play-token/generate \
   -H "Authorization: Bearer PARENT_TOKEN"
@@ -225,6 +240,7 @@ curl -X POST http://localhost:3000/users/play-token/generate \
 ```
 
 ### Activate Child with Play Token
+
 ```bash
 curl -X POST http://localhost:3000/users/play-token/verify \
   -H "Authorization: Bearer CHILD_TOKEN" \
@@ -235,6 +251,7 @@ curl -X POST http://localhost:3000/users/play-token/verify \
 ```
 
 ### Sync Game State After Offline Play
+
 ```bash
 curl -X PATCH http://localhost:3000/game/sync \
   -H "Authorization: Bearer CHILD_TOKEN" \
@@ -305,20 +322,23 @@ happy-backend/
 ## Debugging
 
 ### Enable Debug Logging
+
 ```bash
 DEBUG=nestjs:* npm run start:dev
 ```
 
 ### Check Database Connection
+
 ```bash
 npm run prisma:studio
 ```
 
 ### Verify WebSocket Connection
+
 ```javascript
 // Browser console
 const socket = io('ws://localhost:3000/game', {
-  auth: { token: 'YOUR_TOKEN' }
+  auth: { token: 'YOUR_TOKEN' },
 });
 
 socket.on('connect', () => console.log('Connected'));
@@ -327,6 +347,7 @@ socket.on('error', (error) => console.error('Error:', error));
 ```
 
 ### View Activity Logs
+
 ```bash
 curl -X GET http://localhost:3000/users/activity-logs?limit=20 \
   -H "Authorization: Bearer USER_TOKEN"
@@ -335,24 +356,29 @@ curl -X GET http://localhost:3000/users/activity-logs?limit=20 \
 ## Common Errors & Solutions
 
 ### "Cannot find module @prisma/client"
+
 ```bash
 npm run prisma:generate
 ```
 
 ### "MongoDB connection timeout"
+
 - Check DATABASE_URL in .env
 - Ensure IP whitelist includes your machine
 - Verify credentials are correct
 
 ### "Token expired"
+
 - Login again to get new token
 - Default expiration is 7 days
 
 ### "Item already collected"
+
 - This is validation preventing cheating
 - Item index already exists in levelsData
 
 ### "CORS error on WebSocket"
+
 - Check CORS_ORIGIN in .env
 - Update to match your Godot client URL
 

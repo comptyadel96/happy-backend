@@ -9,6 +9,7 @@ npm run prisma:migrate -- --name add_new_model
 ```
 
 This will:
+
 1. Compare your schema to the database
 2. Detect changes
 3. Generate a migration file in `prisma/migrations/`
@@ -28,6 +29,7 @@ cat prisma/migrations/[timestamp]_[name]/migration.sql
 ## Rolling Back Changes (Development)
 
 For MongoDB, use:
+
 ```bash
 # Reset database (⚠️ deletes all data)
 npx prisma migrate reset
@@ -49,6 +51,7 @@ npx prisma migrate deploy
 ## Schema Changes Workflow
 
 1. **Update schema.prisma**
+
 ```prisma
 model NewModel {
   id    String  @id @default(auto()) @map("_id") @db.ObjectId
@@ -57,21 +60,25 @@ model NewModel {
 ```
 
 2. **Create migration**
+
 ```bash
 npm run prisma:migrate -- --name add_new_model
 ```
 
 3. **Review migration file**
+
 ```bash
 cat prisma/migrations/[timestamp]_add_new_model/migration.sql
 ```
 
 4. **Test locally**
+
 ```bash
 npm run start:dev
 ```
 
 5. **Commit and push**
+
 ```bash
 git add prisma/migrations
 git commit -m "feat: add NewModel migration"
@@ -80,6 +87,7 @@ git commit -m "feat: add NewModel migration"
 ## Common Migration Scenarios
 
 ### Adding a New Field
+
 ```prisma
 // In model
 newField: String?  // optional
@@ -90,6 +98,7 @@ npm run prisma:migrate -- --name add_new_field_to_model
 ```
 
 ### Making a Field Required
+
 ```prisma
 // Change from
 field: String?
@@ -103,6 +112,7 @@ npm run prisma:migrate -- --name make_field_required
 ```
 
 ### Adding a Relationship
+
 ```prisma
 model Parent {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -121,6 +131,7 @@ npm run prisma:migrate -- --name add_parent_child_relationship
 ```
 
 ### Removing a Model
+
 ```bash
 # Remove from schema.prisma
 
@@ -130,23 +141,22 @@ npm run prisma:migrate -- --name remove_old_model
 ## Seeding Data
 
 ### Adding New Seeds
+
 Edit `prisma/seed.ts`:
 
 ```typescript
 async function main() {
   // Existing seeds...
-  
+
   // New seeds
   await prisma.customModel.createMany({
-    data: [
-      { field: 'value1' },
-      { field: 'value2' },
-    ],
+    data: [{ field: 'value1' }, { field: 'value2' }],
   });
 }
 ```
 
 ### Run Seeds
+
 ```bash
 npm run prisma:seed
 ```
@@ -154,6 +164,7 @@ npm run prisma:seed
 ## Troubleshooting Migrations
 
 ### "Migration already applied"
+
 ```bash
 # Check status
 npm run prisma:migrate -- status
@@ -163,6 +174,7 @@ npx prisma migrate reset
 ```
 
 ### "Cannot find migration files"
+
 ```bash
 # Check migration history
 npx prisma migrate status
@@ -172,12 +184,14 @@ ls -la prisma/migrations/
 ```
 
 ### Schema validation errors
+
 ```bash
 # Validate schema syntax
 npx prisma validate
 ```
 
 ### MongoDB connection issues
+
 ```bash
 # Test connection
 npx prisma db execute --stdin < migration.sql

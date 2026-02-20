@@ -10,7 +10,7 @@ async function bootstrap() {
 
   // Security middleware
   app.use(helmet());
-  
+
   // Rate limiting
   const limiter = rateLimit({
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
@@ -36,7 +36,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  
+
   console.log(`✅ Happy Backend is running on port ${port}`);
   console.log(`🎮 WebSocket server available on ws://localhost:${port}/game`);
 }

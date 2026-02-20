@@ -98,7 +98,8 @@ export class AuthService {
 
   // Register Child User
   async registerChild(registerChildDto: RegisterChildDto) {
-    const { email, password, fullName, age, parentContactId } = registerChildDto;
+    const { email, password, fullName, age, parentContactId } =
+      registerChildDto;
 
     // Validate age
     if (age >= 16) {

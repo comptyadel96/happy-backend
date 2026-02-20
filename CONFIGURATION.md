@@ -3,6 +3,7 @@
 ## Environment Variables
 
 ### Required Variables
+
 ```env
 # MongoDB Connection
 DATABASE_URL="mongodb+srv://user:password@cluster.mongodb.net/happy-backend?retryWrites=true&w=majority"
@@ -17,6 +18,7 @@ NODE_ENV="development|production"
 ```
 
 ### Optional Variables (Defaults Provided)
+
 ```env
 # Argon2 Password Hashing
 ARGON2_MEMORY=65540         # Default
@@ -35,16 +37,19 @@ WS_PORT=3001 (optional, uses same as PORT)
 ## Database Configuration
 
 ### MongoDB Connection String Format
+
 ```
 mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
 ```
 
 ### Connection Parameters
+
 - **retryWrites**: true - Automatic retry for transient failures
 - **w**: majority - Write acknowledgment from majority of replicas
 - **authSource**: admin (usually default)
 
 ### MongoDB Atlas Setup
+
 1. Create cluster at mongodb.com
 2. Create database user with password
 3. Whitelist IP addresses
@@ -52,6 +57,7 @@ mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=
 5. Add to .env as DATABASE_URL
 
 ### Local MongoDB (Development)
+
 ```bash
 # Using docker-compose (recommended)
 docker-compose up mongodb
@@ -65,10 +71,12 @@ Connection string: `mongodb://localhost:27017/happy-backend`
 ## Prisma Configuration
 
 ### Schema Location
+
 - File: `prisma/schema.prisma`
 - Contains 7 models for complete game backend
 
 ### Client Generation
+
 ```bash
 npm run prisma:generate
 ```
@@ -76,6 +84,7 @@ npm run prisma:generate
 Creates: `node_modules/@prisma/client`
 
 ### Database Migrations
+
 ```bash
 # Create migration
 npm run prisma:migrate -- --name description
@@ -90,6 +99,7 @@ npm run prisma:seed
 ## JWT Configuration
 
 ### Token Payload
+
 ```json
 {
   "sub": "userId",
@@ -101,11 +111,13 @@ npm run prisma:seed
 ```
 
 ### Token Expiration
+
 - Default: 7 days
 - Configurable via JWT_EXPIRATION
 - Session tracked in database with expiration
 
 ### Token Validation
+
 ```
 1. Extract token from Authorization header
 2. Verify JWT signature with JWT_SECRET
@@ -117,6 +129,7 @@ npm run prisma:seed
 ## Argon2 Configuration
 
 ### Hashing Parameters
+
 ```typescript
 {
   memoryCost: 65540,    // Memory usage (KiB)
@@ -126,6 +139,7 @@ npm run prisma:seed
 ```
 
 ### Security Levels
+
 ```
 Current: Balanced (65540 memory, 3 time, 4 parallelism)
 Higher Security: Increase memory & time (slower hash)
@@ -133,6 +147,7 @@ Faster: Decrease memory & time (less secure)
 ```
 
 ### Password Storage
+
 - Stored as Argon2 hash (not plaintext)
 - Hash includes salt (random per password)
 - Verified using argon2.verify()
@@ -140,11 +155,13 @@ Faster: Decrease memory & time (less secure)
 ## Rate Limiting Configuration
 
 ### Current Settings
+
 - **Window**: 15 minutes (900,000 ms)
 - **Max Requests**: 100 per window
 - **Applied To**: All routes globally
 
 ### Customization
+
 ```env
 # Stricter (50 requests per hour)
 RATE_LIMIT_WINDOW_MS=3600000
@@ -156,6 +173,7 @@ RATE_LIMIT_MAX_REQUESTS=200
 ```
 
 ### Response When Limited
+
 ```json
 {
   "statusCode": 429,
@@ -167,6 +185,7 @@ RATE_LIMIT_MAX_REQUESTS=200
 ## CORS Configuration
 
 ### Default Configuration
+
 ```
 Origin: http://localhost:*
 Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
@@ -174,25 +193,25 @@ Headers: Content-Type, Authorization
 ```
 
 ### Production Configuration
+
 ```env
 CORS_ORIGIN="https://yourdomain.com"
 ```
 
 ### Multiple Origins (Advanced)
+
 Modify in `src/main.ts`:
+
 ```typescript
 app.enableCors({
-  origin: [
-    'https://domain1.com',
-    'https://domain2.com',
-    'https://domain3.com'
-  ]
+  origin: ['https://domain1.com', 'https://domain2.com', 'https://domain3.com'],
 });
 ```
 
 ## Security Configuration
 
 ### Helmet (HTTP Headers)
+
 ```
 - Content Security Policy (CSP)
 - X-Frame-Options (Clickjacking protection)
@@ -203,19 +222,23 @@ app.enableCors({
 ```
 
 ### HTTPS/WSS (Production)
+
 All connections should use:
+
 - HTTPS for HTTP/REST APIs
 - WSS for WebSocket connections
 
 ## Parental Control Configuration
 
 ### Child Account Rules
+
 - Age must be < 16
 - Parent contact required
 - Requires email verification
 - Play token needed for unlocking features
 
 ### Content Restrictions
+
 ```typescript
 enum ContentRestriction {
   NONE       // No restrictions (adults)
@@ -228,11 +251,13 @@ enum ContentRestriction {
 ## Logging Configuration
 
 ### Log Types
+
 1. **Activity Logs**: User actions (login, items collected, etc.)
 2. **Error Logs**: HTTP errors, exceptions
 3. **Console Logs**: Development output
 
 ### Activity Log Actions
+
 ```
 - REGISTRATION: New account created
 - LOGIN: User authenticated
@@ -245,20 +270,23 @@ enum ContentRestriction {
 ## WebSocket Configuration
 
 ### Namespace
+
 ```
 /game
 ```
 
 ### Connection Authentication
+
 ```javascript
 const socket = io('ws://localhost:3000/game', {
   auth: {
-    token: 'JWT_TOKEN_HERE'
-  }
+    token: 'JWT_TOKEN_HERE',
+  },
 });
 ```
 
 ### Heartbeat Configuration
+
 - Interval: Client-driven (on-demand)
 - Response: Server responds immediately
 - Purpose: Keep connection alive, detect stale connections
@@ -266,17 +294,20 @@ const socket = io('ws://localhost:3000/game', {
 ## Development Configuration
 
 ### Environment
+
 ```env
 NODE_ENV=development
 ```
 
 ### Hot Reload
+
 ```bash
 npm run start:dev
 # Automatically rebuilds and restarts on file changes
 ```
 
 ### Debug Mode
+
 ```bash
 npm run start:debug
 # Starts debugger on port 9229
@@ -284,12 +315,14 @@ npm run start:debug
 ```
 
 ### Source Maps
+
 - Enabled by default in development
 - Maps compiled .js back to .ts for debugging
 
 ## Production Configuration
 
 ### Environment
+
 ```env
 NODE_ENV=production
 JWT_SECRET="use-strong-random-string-from-secrets-manager"
@@ -297,12 +330,14 @@ DATABASE_URL="use-managed-mongodb-atlas"
 ```
 
 ### Build
+
 ```bash
 npm run build
 npm run start:prod
 ```
 
 ### Optimization
+
 - No source maps in production
 - Tree-shaking enabled
 - Minification enabled
@@ -311,6 +346,7 @@ npm run start:prod
 ## Docker Configuration
 
 ### Dockerfile
+
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
@@ -323,22 +359,24 @@ CMD ["node", "dist/main.js"]
 ```
 
 ### Docker Compose
+
 ```yaml
 services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       DATABASE_URL: ${DATABASE_URL}
-  
+
   mongodb:
     image: mongo:7.0
     ports:
-      - "27017:27017"
+      - '27017:27017'
 ```
 
 ### Building & Running
+
 ```bash
 # Build image
 docker build -t happy-backend .
@@ -353,11 +391,13 @@ docker-compose up
 ## Database Backup Configuration
 
 ### Automated Backups (MongoDB Atlas)
+
 - Enable automated backups (default: daily)
 - 35-day backup retention
 - Point-in-time recovery
 
 ### Manual Backup
+
 ```bash
 # Export database
 mongodump --uri "mongodb+srv://..." --out ./backup
@@ -369,12 +409,14 @@ mongorestore --uri "mongodb+srv://..." ./backup
 ## Monitoring Configuration
 
 ### Health Check
+
 ```
 GET /health
 Response: { "status": "ok" }
 ```
 
 ### Metrics to Monitor
+
 1. Database connection pool
 2. WebSocket connections
 3. Request latency
@@ -383,6 +425,7 @@ Response: { "status": "ok" }
 6. Game state sync success rate
 
 ### Alert Thresholds
+
 - Error rate > 5%
 - Response time > 1s
 - Database connection failures
@@ -391,37 +434,41 @@ Response: { "status": "ok" }
 ## Troubleshooting Configuration Issues
 
 ### "MongoDB connection timeout"
+
 - Check DATABASE_URL
 - Verify IP whitelist in MongoDB Atlas
 - Test network connectivity
 
 ### "JWT token invalid"
+
 - Check JWT_SECRET matches between registration and login
 - Verify token not expired
 - Check session exists in database
 
 ### "CORS error"
+
 - Update CORS_ORIGIN in .env
 - Include protocol (http:// or https://)
 - Check WebSocket namespace
 
 ### "Rate limit exceeded"
+
 - Increase RATE_LIMIT_MAX_REQUESTS
 - Increase RATE_LIMIT_WINDOW_MS
 - Or wait for window to reset
 
 ## Configuration Files Summary
 
-| File | Purpose |
-|------|---------|
-| .env | Runtime configuration (secrets) |
-| .env.example | Configuration template |
-| prisma.config.ts | Prisma settings |
-| nest-cli.json | NestJS compiler |
-| tsconfig.json | TypeScript settings |
-| src/config/config.ts | App configuration |
-| docker-compose.yml | Container setup |
-| Dockerfile | Container image |
+| File                 | Purpose                         |
+| -------------------- | ------------------------------- |
+| .env                 | Runtime configuration (secrets) |
+| .env.example         | Configuration template          |
+| prisma.config.ts     | Prisma settings                 |
+| nest-cli.json        | NestJS compiler                 |
+| tsconfig.json        | TypeScript settings             |
+| src/config/config.ts | App configuration               |
+| docker-compose.yml   | Container setup                 |
+| Dockerfile           | Container image                 |
 
 ---
 

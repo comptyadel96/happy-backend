@@ -25,10 +25,7 @@ export class GameService {
   }
 
   // Validate item collection against level constraints
-  async validateItemCollection(
-    userId: string,
-    payload: CollectItemPayload,
-  ) {
+  async validateItemCollection(userId: string, payload: CollectItemPayload) {
     const levelData = await this.getLevelData(payload.levelId);
 
     if (!levelData) {
@@ -82,10 +79,7 @@ export class GameService {
   }
 
   // Handle item collection
-  async handleItemCollection(
-    userId: string,
-    payload: CollectItemPayload,
-  ) {
+  async handleItemCollection(userId: string, payload: CollectItemPayload) {
     const validation = await this.validateItemCollection(userId, payload);
 
     if (!validation.valid) {
@@ -143,10 +137,7 @@ export class GameService {
   }
 
   // Handle level completion
-  async handleLevelComplete(
-    userId: string,
-    payload: LevelCompletePayload,
-  ) {
+  async handleLevelComplete(userId: string, payload: LevelCompletePayload) {
     const gameProfile = await this.prisma.gameProfile.findUnique({
       where: { userId },
     });

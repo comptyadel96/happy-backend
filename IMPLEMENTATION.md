@@ -50,6 +50,7 @@ npm run start:prod
 ### Authentication
 
 #### Register Adult User
+
 ```http
 POST /auth/register-adult
 Content-Type: application/json
@@ -63,6 +64,7 @@ Content-Type: application/json
 ```
 
 #### Register Child User
+
 ```http
 POST /auth/register-child
 Content-Type: application/json
@@ -77,6 +79,7 @@ Content-Type: application/json
 ```
 
 #### Login
+
 ```http
 POST /auth/login
 Content-Type: application/json
@@ -96,12 +99,14 @@ Response:
 ### User Management
 
 #### Get User Profile
+
 ```http
 GET /users/profile
 Authorization: Bearer {token}
 ```
 
 #### Update Game Profile
+
 ```http
 PATCH /users/profile
 Authorization: Bearer {token}
@@ -116,12 +121,14 @@ Content-Type: application/json
 ```
 
 #### Get Activity Logs
+
 ```http
 GET /users/activity-logs?limit=50
 Authorization: Bearer {token}
 ```
 
 #### Generate Play Token (Parent)
+
 ```http
 POST /users/play-token/generate
 Authorization: Bearer {token}
@@ -133,6 +140,7 @@ Response:
 ```
 
 #### Verify Child with Play Token
+
 ```http
 POST /users/play-token/verify
 Authorization: Bearer {token}
@@ -146,12 +154,14 @@ Content-Type: application/json
 ### Game Management
 
 #### Get Level Data
+
 ```http
 GET /game/level/{levelId}
 Authorization: Bearer {token}
 ```
 
 #### Collect Item (REST endpoint)
+
 ```http
 PATCH /game/item-collect
 Authorization: Bearer {token}
@@ -165,6 +175,7 @@ Content-Type: application/json
 ```
 
 #### Complete Level
+
 ```http
 PATCH /game/level-complete
 Authorization: Bearer {token}
@@ -178,6 +189,7 @@ Content-Type: application/json
 ```
 
 #### Sync Game State (Offline to Online)
+
 ```http
 PATCH /game/sync
 Authorization: Bearer {token}
@@ -200,6 +212,7 @@ Connect to `ws://localhost:3000/game` with token in auth header.
 ### Client → Server Events
 
 #### Heartbeat
+
 ```javascript
 socket.emit('heartbeat', {}, (response) => {
   console.log('Heartbeat response:', response);
@@ -207,33 +220,37 @@ socket.emit('heartbeat', {}, (response) => {
 ```
 
 #### Player Move
+
 ```javascript
 socket.emit('player_move', {
   levelId: 1,
   x: 100,
-  y: 200
+  y: 200,
 });
 ```
 
 #### Item Collection
+
 ```javascript
 socket.emit('item_collected', {
   levelId: 1,
   itemType: 'chocolate', // or 'egg'
-  itemIndex: 5
+  itemIndex: 5,
 });
 ```
 
 #### Level Complete
+
 ```javascript
 socket.emit('level_complete', {
   levelId: 1,
   score: 250,
-  timeSpent: 180
+  timeSpent: 180,
 });
 ```
 
 #### Game State Sync
+
 ```javascript
 socket.emit('game_sync', {
   levelsData: { ... },
@@ -261,12 +278,14 @@ socket.emit('game_sync', {
 ## 🔐 Security Features
 
 ### Authentication & Authorization
+
 - ✅ JWT token-based authentication
 - ✅ Argon2 password hashing
 - ✅ Refresh token support
 - ✅ Role-based access control (ADULT/CHILD)
 
 ### Data Protection
+
 - ✅ Helmet security headers
 - ✅ Rate limiting (100 requests per 15 minutes)
 - ✅ CORS configuration
@@ -274,6 +293,7 @@ socket.emit('game_sync', {
 - ✅ Sensitive data sanitization
 
 ### Parental Controls
+
 - ✅ Mandatory parent contact for children under 16
 - ✅ Parent verification system
 - ✅ Play token generation by parents
@@ -285,32 +305,38 @@ socket.emit('game_sync', {
 ### Core Models
 
 #### User
+
 - **Roles**: ADULT, CHILD
 - **Sensitive Data**: Full name, physical address, age
 - **Parental Link**: Parent contact reference for children
 - **Security**: isVerifiedByParent, playTokens, isActive
 
 #### GameProfile
+
 - **State**: Current level, total score, play time
 - **Game Data**: levelsData, inventory, missions, achievements (JSON)
 - **Options**: Language (default: "ar"), sound, music, content restrictions
 - **Sync**: pendingSync, lastSyncAt, lastPlayedAt
 
 #### LevelData
+
 - **Configuration**: Level ID, name, difficulty
 - **Constraints**: maxChocolates (default 30), maxEggs (default 20)
 - **Validation**: Total elements count
 
 #### ParentContact
+
 - **Information**: Name, phone, email
 - **Verification**: Code-based verification system
 - **Status**: isVerified, verifiedAt
 
 #### UserSession
+
 - **Tracking**: JWT token, expiration time
 - **Management**: isActive status
 
 #### ActivityLog
+
 - **Monitoring**: User actions (LOGIN, REGISTRATION, ITEM_COLLECTED, LEVEL_COMPLETED, GAME_STATE_SYNCED)
 - **Debugging**: IP address, user agent, detailed metadata
 
@@ -319,6 +345,7 @@ socket.emit('game_sync', {
 ### Item Collection Validation
 
 When collecting items, the backend validates:
+
 1. ✅ Level exists
 2. ✅ Item index is within bounds (< maxItems for level)
 3. ✅ Item hasn't been collected before in this level
@@ -335,6 +362,7 @@ When collecting items, the backend validates:
 ### Game State Sync
 
 Supports offline-to-online transitions:
+
 - Merge offline changes with server state
 - Validate all state updates
 - Preserve integrity of collected items
@@ -355,7 +383,7 @@ func _ready():
             "token": user_token
         }
     })
-    
+
     socket.on("connection_established", Callable(self, "_on_connected"))
     socket.on("item_collected", Callable(self, "_on_item_collected"))
     socket.on("level_completed", Callable(self, "_on_level_completed"))
@@ -479,6 +507,7 @@ The API returns consistent error responses:
 ```
 
 Common error codes:
+
 - `400` - Bad Request (validation failed)
 - `401` - Unauthorized (invalid credentials/token)
 - `403` - Forbidden (insufficient permissions)
@@ -489,6 +518,7 @@ Common error codes:
 ## 📈 Monitoring
 
 All user actions are logged in ActivityLog:
+
 - User registrations and logins
 - Item collections
 - Level completions

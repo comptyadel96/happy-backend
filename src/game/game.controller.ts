@@ -1,4 +1,12 @@
-import { Controller, Get, Patch, Body, UseGuards, Request, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Body,
+  UseGuards,
+  Request,
+  Param,
+} from '@nestjs/common';
 import { GameService } from './game.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 

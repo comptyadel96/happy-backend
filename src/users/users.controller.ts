@@ -37,10 +37,7 @@ export class UsersController {
   }
 
   @Get('activity-logs')
-  async getActivityLogs(
-    @Request() req,
-    @Query('limit') limit?: string,
-  ) {
+  async getActivityLogs(@Request() req, @Query('limit') limit?: string) {
     return this.usersService.getUserActivityLogs(
       req.user.userId,
       limit ? parseInt(limit) : 50,
@@ -75,10 +72,7 @@ export class UsersController {
   }
 
   @Post('play-token/verify')
-  async verifyPlayToken(
-    @Request() req,
-    @Body('token') token: string,
-  ) {
+  async verifyPlayToken(@Request() req, @Body('token') token: string) {
     return this.usersService.verifyChildWithToken(req.user.userId, token);
   }
 

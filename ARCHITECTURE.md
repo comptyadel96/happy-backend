@@ -51,6 +51,7 @@ Happy Backend is a secure, scalable WebSocket-based game server for Godot games,
 ### `AuthModule` - Authentication & Authorization
 
 **Responsibilities:**
+
 - User registration (Adult/Child)
 - Login & token generation
 - JWT validation
@@ -59,6 +60,7 @@ Happy Backend is a secure, scalable WebSocket-based game server for Godot games,
 - WebSocket JWT authentication
 
 **Key Classes:**
+
 - `AuthService`: Core authentication logic
 - `AuthController`: REST endpoints
 - `JwtStrategy`: Passport JWT strategy
@@ -66,19 +68,21 @@ Happy Backend is a secure, scalable WebSocket-based game server for Godot games,
 - `WsJwtGuard`: WebSocket JWT guard
 
 **Key Methods:**
+
 ```typescript
-registerAdult(dto)          // Register adult account
-registerChild(dto)          // Register child account with parent link
-login(dto)                  // Authenticate user
-hashPassword(password)      // Argon2 hashing
-verifyPassword(pwd, hash)   // Password verification
-generateToken(user)         // JWT token generation
-validateToken(token)        // Token validation & session check
+registerAdult(dto); // Register adult account
+registerChild(dto); // Register child account with parent link
+login(dto); // Authenticate user
+hashPassword(password); // Argon2 hashing
+verifyPassword(pwd, hash); // Password verification
+generateToken(user); // JWT token generation
+validateToken(token); // Token validation & session check
 ```
 
 ### `UsersModule` - User Management & Profiles
 
 **Responsibilities:**
+
 - User profile retrieval & management
 - Game profile updates
 - Parental contact creation & verification
@@ -87,23 +91,26 @@ validateToken(token)        // Token validation & session check
 - Activity log tracking
 
 **Key Classes:**
+
 - `UsersService`: User data management
 - `UsersController`: REST endpoints
 
 **Key Methods:**
+
 ```typescript
-getUserProfile(userId)              // Get profile with game progress
-updateGameProfile(userId, data)     // Update game settings
-createParentContact(data)           // Create parent verification record
-verifyParentContact(id, code)       // Verify parent identity
-generatePlayToken(userId)           // Generate child play token
-verifyChildWithToken(childId, token) // Activate child account
-getUserActivityLogs(userId, limit)  // Get user activity history
+getUserProfile(userId); // Get profile with game progress
+updateGameProfile(userId, data); // Update game settings
+createParentContact(data); // Create parent verification record
+verifyParentContact(id, code); // Verify parent identity
+generatePlayToken(userId); // Generate child play token
+verifyChildWithToken(childId, token); // Activate child account
+getUserActivityLogs(userId, limit); // Get user activity history
 ```
 
 ### `GameModule` - Game Logic & WebSocket
 
 **Responsibilities:**
+
 - Real-time state synchronization
 - Item collection validation against level constraints
 - Level completion tracking
@@ -112,34 +119,39 @@ getUserActivityLogs(userId, limit)  // Get user activity history
 - Heartbeat monitoring
 
 **Key Classes:**
+
 - `GameService`: Game logic engine
 - `GameController`: REST endpoints
 - `GameGateway`: WebSocket gateway
 - `GameModule`: Module definition
 
 **Key Methods:**
+
 ```typescript
-getLevelData(levelId)               // Retrieve level configuration
-validateItemCollection(userId, payload)  // Validate item collection
-handleItemCollection(userId, payload)    // Process item collection
-handleLevelComplete(userId, payload)     // Handle level completion
-syncGameState(userId, syncData)     // Sync offline changes
+getLevelData(levelId); // Retrieve level configuration
+validateItemCollection(userId, payload); // Validate item collection
+handleItemCollection(userId, payload); // Process item collection
+handleLevelComplete(userId, payload); // Handle level completion
+syncGameState(userId, syncData); // Sync offline changes
 ```
 
 ### `PrismaModule` - Database Access
 
 **Responsibilities:**
+
 - Prisma Client initialization
 - Connection lifecycle management
 - Service injection
 
 **Key Classes:**
+
 - `PrismaService`: Prisma Client wrapper
 - `PrismaModule`: Module definition
 
 ## Authentication Flow
 
 ### Adult Registration
+
 ```
 POST /auth/register-adult
 ├─ Validate input (email, password, fullName)
@@ -154,6 +166,7 @@ POST /auth/register-adult
 ```
 
 ### Child Registration
+
 ```
 POST /auth/register-child
 ├─ Validate input (age <= 15)
@@ -170,6 +183,7 @@ POST /auth/register-child
 ```
 
 ### Login Flow
+
 ```
 POST /auth/login
 ├─ Validate credentials
@@ -183,6 +197,7 @@ POST /auth/login
 ```
 
 ### WebSocket Connection
+
 ```
 socket.connect(auth: { token })
 ├─ Extract token from auth header
@@ -197,6 +212,7 @@ socket.connect(auth: { token })
 ## Game State Management
 
 ### Item Collection Flow
+
 ```
 WebSocket: item_collected
 ├─ Extract userId & payload
@@ -213,6 +229,7 @@ WebSocket: item_collected
 ```
 
 ### Level Completion Flow
+
 ```
 WebSocket: level_complete
 ├─ Extract userId & payload (levelId, score, timeSpent)
@@ -226,6 +243,7 @@ WebSocket: level_complete
 ```
 
 ### Game State Sync (Offline→Online)
+
 ```
 PATCH /game/sync
 ├─ Extract userId & syncData
@@ -246,6 +264,7 @@ PATCH /game/sync
 ## Data Models
 
 ### User Model
+
 ```typescript
 {
   id: ObjectId               // Unique identifier
@@ -253,23 +272,23 @@ PATCH /game/sync
   password: string           // Argon2 hashed
   fullName: string           // Sensitive data
   role: UserRole             // ADULT | CHILD
-  
+
   // Sensitive Data
   physicalAddress?: string
   age?: number               // 1-15 for children
-  
+
   // Child Account Linkage
   parentContactId?: ObjectId // Reference to parent
-  
+
   // Parental Control
   isVerifiedByParent: boolean // Initially true for ADULT
   playTokens: string[]       // Generated by parent for child
-  
+
   // Account Status
   isActive: boolean          // Soft delete
   createdAt: Date
   updatedAt: Date
-  
+
   // Relations
   gameProfile: GameProfile
   sessions: UserSession[]
@@ -278,54 +297,57 @@ PATCH /game/sync
 ```
 
 ### GameProfile Model
+
 ```typescript
 {
-  id: ObjectId              // Unique identifier
-  userId: ObjectId          // Unique relation to User
-  
+  id: ObjectId; // Unique identifier
+  userId: ObjectId; // Unique relation to User
+
   // Game Options
-  language: string          // Default "ar" (Arabic)
-  soundEnabled: boolean
-  musicEnabled: boolean
-  contentRestriction: ContentRestriction // NONE|MILD|MODERATE|STRICT
-  
+  language: string; // Default "ar" (Arabic)
+  soundEnabled: boolean;
+  musicEnabled: boolean;
+  contentRestriction: ContentRestriction; // NONE|MILD|MODERATE|STRICT
+
   // Game Progression
-  currentLevel: number
-  totalScore: number
-  totalPlayTime: number     // in seconds
-  
+  currentLevel: number;
+  totalScore: number;
+  totalPlayTime: number; // in seconds
+
   // Deeply Nested Game State (JSON)
-  levelsData: object        // { level_1: {chocolatesTaken, eggsTaken, ...} }
-  inventory: object         // Collected items
-  missions: object          // Mission progress
-  achievements: object      // Unlocked achievements
-  
+  levelsData: object; // { level_1: {chocolatesTaken, eggsTaken, ...} }
+  inventory: object; // Collected items
+  missions: object; // Mission progress
+  achievements: object; // Unlocked achievements
+
   // Sync Management
-  pendingSync: boolean      // Offline changes pending
-  lastSyncAt: Date
-  lastPlayedAt: Date
-  
-  createdAt: Date
-  updatedAt: Date
+  pendingSync: boolean; // Offline changes pending
+  lastSyncAt: Date;
+  lastPlayedAt: Date;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 ```
 
 ### LevelData Model
+
 ```typescript
 {
-  id: ObjectId              // Unique identifier
-  levelId: number           // Unique, sequential
-  levelName: string
-  maxChocolates: number     // Default 30
-  maxEggs: number           // Default 20
-  totalElements: number
-  difficulty: string        // easy|medium|hard
-  createdAt: Date
-  updatedAt: Date
+  id: ObjectId; // Unique identifier
+  levelId: number; // Unique, sequential
+  levelName: string;
+  maxChocolates: number; // Default 30
+  maxEggs: number; // Default 20
+  totalElements: number;
+  difficulty: string; // easy|medium|hard
+  createdAt: Date;
+  updatedAt: Date;
 }
 ```
 
 ### ParentContact Model
+
 ```typescript
 {
   id: ObjectId              // Unique identifier
@@ -337,26 +359,28 @@ PATCH /game/sync
   verifiedAt?: Date
   createdAt: Date
   updatedAt: Date
-  
+
   // Relations
   childUsers: User[]        // Inverse relation
 }
 ```
 
 ### UserSession Model
+
 ```typescript
 {
-  id: ObjectId              // Unique identifier
-  userId: ObjectId          // Reference to User
-  token: string             // Unique JWT token
-  expiresAt: Date
-  isActive: boolean
-  createdAt: Date
-  updatedAt: Date
+  id: ObjectId; // Unique identifier
+  userId: ObjectId; // Reference to User
+  token: string; // Unique JWT token
+  expiresAt: Date;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 ```
 
 ### ActivityLog Model
+
 ```typescript
 {
   id: ObjectId              // Unique identifier
@@ -370,6 +394,7 @@ PATCH /game/sync
 ```
 
 ### WebSocketConnection Model
+
 ```typescript
 {
   id: ObjectId              // Unique identifier
@@ -384,17 +409,20 @@ PATCH /game/sync
 ## Security Features
 
 ### Password Security
+
 - **Hashing**: Argon2 with configurable memory/time/parallelism
 - **Salting**: Automatic via Argon2
 - **Never stored**: Plain passwords never stored or logged
 
 ### JWT Security
+
 - **Secret**: Environment variable, not hardcoded
 - **Expiration**: Default 7 days
 - **Validation**: Token signature + session check
 - **Refresh**: New token on each login
 
 ### Parental Controls
+
 1. **Age Verification**: Children < 16 require parent contact
 2. **Parent Verification**: Email/code confirmation
 3. **Play Tokens**: Parent generates, child uses to unlock features
@@ -402,6 +430,7 @@ PATCH /game/sync
 5. **Account Lockdown**: Parent can deactivate child account
 
 ### API Security
+
 - **CORS**: Configurable origin validation
 - **Rate Limiting**: 100 requests per 15 minutes
 - **Helmet**: Security headers (CSP, X-Frame-Options, etc.)
@@ -409,6 +438,7 @@ PATCH /game/sync
 - **SQL Injection**: N/A (MongoDB, but field injection prevented)
 
 ### Data Protection
+
 - **Sensitive Data**: Sanitized in responses (no passwords)
 - **Encryption**: At-rest (MongoDB Enterprise) or in transit (HTTPS/WSS)
 - **Activity Logs**: Track all user actions for audit
@@ -417,6 +447,7 @@ PATCH /game/sync
 ## Error Handling
 
 ### HTTP Error Responses
+
 ```json
 {
   "statusCode": 400|401|403|404|409|500,
@@ -426,6 +457,7 @@ PATCH /game/sync
 ```
 
 ### WebSocket Error Responses
+
 ```json
 {
   "error": "Error message",
@@ -437,6 +469,7 @@ PATCH /game/sync
 ## Performance Considerations
 
 ### Database Indexing
+
 - `User.email`: Unique index (fast login)
 - `User.parentContactId`: Index (query children by parent)
 - `GameProfile.userId`: Unique index (1:1 relation)
@@ -445,11 +478,13 @@ PATCH /game/sync
 - `WebSocketConnection.socketId`: Unique index
 
 ### Caching Strategy
+
 - JWT tokens validated via session lookup (not cached)
 - Level data static (cache with Prisma or Redis)
 - User profiles: Load on login, update on sync
 
 ### Query Optimization
+
 - Include relations strategically
 - Limit activity logs to recent entries
 - Paginate user listings
@@ -457,6 +492,7 @@ PATCH /game/sync
 ## Monitoring & Logging
 
 ### Activity Tracking
+
 - User registrations and logins
 - Item collections (prevent cheating)
 - Level completions (verify progress)
@@ -464,12 +500,14 @@ PATCH /game/sync
 - Account changes
 
 ### Real-time Monitoring
+
 - WebSocket connections/disconnections
 - Failed authentication attempts
 - Rate limit violations
 - Database connection health
 
 ### Metrics
+
 - Active user count
 - Concurrent WebSocket connections
 - Average response times
@@ -478,6 +516,7 @@ PATCH /game/sync
 ## Deployment
 
 ### Environment Variables
+
 ```bash
 # Database
 DATABASE_URL=mongodb+srv://...
@@ -502,6 +541,7 @@ CORS_ORIGIN=https://yourdomain.com
 ```
 
 ### Production Checklist
+
 - [ ] Set strong JWT_SECRET
 - [ ] Use MongoDB Atlas (managed MongoDB)
 - [ ] Enable HTTPS/WSS

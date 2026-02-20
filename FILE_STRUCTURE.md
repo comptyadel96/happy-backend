@@ -91,6 +91,7 @@ happy-backend/
 ## Module Breakdown
 
 ### 🔐 Auth Module (`src/auth/`)
+
 ```
 auth/
 ├── auth.service.ts              # 250+ lines - Core authentication
@@ -119,6 +120,7 @@ auth/
 ```
 
 ### 👥 Users Module (`src/users/`)
+
 ```
 users/
 ├── users.service.ts             # 150+ lines - User management
@@ -145,6 +147,7 @@ users/
 ```
 
 ### 🎮 Game Module (`src/game/`)
+
 ```
 game/
 ├── game.service.ts              # 200+ lines - Game logic
@@ -173,6 +176,7 @@ game/
 ```
 
 ### 🗄️ Database Layer (`src/prisma/` + `prisma/`)
+
 ```
 Database Setup
 ├── prisma/schema.prisma         # 7 MongoDB models (250+ lines)
@@ -195,6 +199,7 @@ Database Setup
 ## Key Statistics
 
 ### Code Files
+
 - **TypeScript Source Files**: 23
 - **DTO Files**: 3
 - **Module Files**: 5
@@ -204,18 +209,21 @@ Database Setup
 - **Test Files**: 2
 
 ### Documentation Files
+
 - **Main Documentation**: 6 files
 - **Total Doc Lines**: 2000+ lines
 - **API Endpoints Documented**: 17
 - **WebSocket Events Documented**: 6
 
 ### Database Models
+
 - **Total Models**: 7
 - **Relations**: 4 (One-to-Many, Many-to-One)
 - **Enums**: 2 (UserRole, ContentRestriction)
 - **JSON Fields**: 4 (levelsData, inventory, missions, achievements)
 
 ### API Endpoints
+
 - **REST Endpoints**: 17
 - **WebSocket Events**: 6
 - **Authentication Endpoints**: 3
@@ -223,6 +231,7 @@ Database Setup
 - **Game Endpoints**: 4
 
 ### Lines of Code
+
 - **Source Code**: 1500+ lines (TypeScript)
 - **Documentation**: 2000+ lines
 - **Configuration**: 200+ lines
@@ -250,18 +259,19 @@ dist/src/
 
 ## Key Features by File
 
-| File | Key Features |
-|------|---|
-| **auth.service.ts** | Argon2 hashing, JWT tokens, 2-tier authentication |
-| **users.service.ts** | Parental controls, play tokens, account management |
-| **game.service.ts** | Item validation, level constraints, state sync |
-| **game.gateway.ts** | Real-time events, heartbeat, broadcasting |
-| **prisma/schema.prisma** | 7 models, JSON state storage, audit trail |
-| **seed.ts** | 5 game levels with varying difficulty |
+| File                     | Key Features                                       |
+| ------------------------ | -------------------------------------------------- |
+| **auth.service.ts**      | Argon2 hashing, JWT tokens, 2-tier authentication  |
+| **users.service.ts**     | Parental controls, play tokens, account management |
+| **game.service.ts**      | Item validation, level constraints, state sync     |
+| **game.gateway.ts**      | Real-time events, heartbeat, broadcasting          |
+| **prisma/schema.prisma** | 7 models, JSON state storage, audit trail          |
+| **seed.ts**              | 5 game levels with varying difficulty              |
 
 ## Environment Files
 
 ### .env (Runtime)
+
 - DATABASE_URL: MongoDB connection
 - JWT_SECRET: Token signing key
 - JWT_EXPIRATION: Token lifetime
@@ -270,12 +280,14 @@ dist/src/
 - CORS configuration
 
 ### .env.example (Template)
+
 - Same as .env with placeholder values
 - Safe to commit to Git
 
 ## Build Outputs
 
 ### TypeScript → JavaScript
+
 ```
 src/*.ts          → dist/src/*.js
 src/**/*.ts       → dist/src/**/*.js
@@ -283,10 +295,12 @@ prisma.config.ts  → dist/prisma.config.js
 ```
 
 ### Map Files
+
 - `.js.map` files for debugging
 - Source maps point back to TypeScript
 
 ### Declaration Files
+
 - `.d.ts` files for type information
 - Enables TypeScript intellisense
 
@@ -302,6 +316,7 @@ prisma.config.ts  → dist/prisma.config.js
 ## Dependencies Included
 
 **Direct Dependencies** (package.json):
+
 - @nestjs/common, @nestjs/core
 - @nestjs/jwt, @nestjs/passport
 - @nestjs/websockets, @nestjs/platform-socket.io
@@ -313,6 +328,7 @@ prisma.config.ts  → dist/prisma.config.js
 - socket.io
 
 **Dev Dependencies**:
+
 - @nestjs/cli, @nestjs/schematics
 - @nestjs/testing
 - typescript, ts-node
@@ -323,6 +339,7 @@ prisma.config.ts  → dist/prisma.config.js
 ## Ready for Production ✅
 
 All files are properly organized and ready for:
+
 - 🚀 Deployment (Docker + MongoDB Atlas)
 - 🧪 Testing (Jest + E2E)
 - 📊 Monitoring (Activity logs)
