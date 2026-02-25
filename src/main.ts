@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
@@ -30,6 +32,10 @@ async function bootstrap() {
     }),
   );
 
+  // Global interceptors & filters
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new GlobalExceptionFilter());
+
   // Enable graceful shutdown
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
@@ -39,6 +45,7 @@ async function bootstrap() {
 
   console.log(`✅ Happy Backend is running on port ${port}`);
   console.log(`🎮 WebSocket server available on ws://localhost:${port}/game`);
+  console.log(`📦 Instance ID: ${process.env.INSTANCE_ID || 'localhost'}`);
 }
 
 bootstrap();
