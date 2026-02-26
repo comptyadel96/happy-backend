@@ -9,15 +9,15 @@ import rateLimit from 'express-rate-limit';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-
+  // app.set('trust proxy', 1);
   // Security middleware
   app.use(helmet());
 
   // Rate limiting
-  const limiter = rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
-  });
+  // const limiter = rateLimit({
+  //   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
+  //   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
+  // });
   app.use(limiter);
 
   // Global validation pipe
