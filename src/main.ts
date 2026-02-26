@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -46,12 +46,46 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // Swagger Documentation
+  const config = new DocumentBuilder()
+    .setTitle('Happy Backend API')
+    .setDescription(
+      'API documentation for Happy - Secure Game Backend for Godot',
+    )
+    .setVersion('1.0.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'access-token',
+    )
+    .addTag('Auth', 'Authentication endpoints')
+    .addTag('Users', 'User management endpoints')
+    .addTag('Game', 'Game logic endpoints')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      tagsSorter: 'alpha',
+    },
+  });
+
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
   console.log(`✅ Happy Backend is running on port ${port}`);
   console.log(`🎮 WebSocket server available on ws://localhost:${port}/game`);
+  console.log(
+    `📚 Swagger documentation available at http://localhost:${port}/api/docs`,
+  );
   console.log(`📦 Instance ID: ${process.env.INSTANCE_ID || 'localhost'}`);
 }
 
-bootstrap();
+void bootstrap();

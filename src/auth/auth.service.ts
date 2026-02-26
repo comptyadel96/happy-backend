@@ -8,8 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRole } from '@prisma/client';
-import { RegisterAdultDto } from './dto/register-adult.dto';
-import { RegisterChildDto } from './dto/register-child.dto';
+import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
@@ -33,76 +32,29 @@ export class AuthService {
     return argon2.verify(hash, password);
   }
 
-  // Register Adult User
-  async registerAdult(registerAdultDto: RegisterAdultDto) {
-    const { email, password, fullName, physicalAddress } = registerAdultDto;
+  // Unified Register Method (Adult & Child)
+  async register(registerDto: RegisterDto) {
+    const {
+      email,
+      password,
+      fullName,
+      age,
+      isAdult,
+      phone,
+      physicalAddress,
+      parentPhone,
+      parentEmail,
+      parentName,
+    } = registerDto;
 
-    // Check if user exists
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      throw new ConflictException('Email already in use');
+    // Validate age range
+    if (isAdult && age < 18) {
+      throw new BadRequestException(
+        'Adult accounts require minimum age of 18',
+      );
     }
 
-    // Hash password
-    const hashedPassword = await this.hashPassword(password);
-
-    // Create user
-    const user = await this.prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        fullName,
-        physicalAddress,
-        role: UserRole.ADULT,
-        isVerifiedByParent: true, // Adults don't need parent verification
-        gameProfile: {
-          create: {
-            language: 'ar',
-          },
-        },
-      },
-      include: {
-        gameProfile: true,
-      },
-    });
-
-    // Generate JWT token
-    const token = this.generateToken(user);
-
-    // Create session
-    await this.prisma.userSession.create({
-      data: {
-        userId: user.id,
-        token,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      },
-    });
-
-    // Log activity
-    await this.prisma.activityLog.create({
-      data: {
-        userId: user.id,
-        action: 'REGISTRATION',
-        details: { role: 'ADULT' },
-      },
-    });
-
-    return {
-      user: this.sanitizeUser(user),
-      token,
-    };
-  }
-
-  // Register Child User
-  async registerChild(registerChildDto: RegisterChildDto) {
-    const { email, password, fullName, age, parentContactId } =
-      registerChildDto;
-
-    // Validate age
-    if (age >= 16) {
+    if (!isAdult && age >= 16) {
       throw new BadRequestException(
         'Child accounts are for users under 16 years old',
       );
@@ -117,20 +69,41 @@ export class AuthService {
       throw new ConflictException('Email already in use');
     }
 
-    // Verify parent contact exists if provided
-    let parent: any = null;
-    if (parentContactId) {
-      parent = await this.prisma.parentContact.findUnique({
-        where: { id: parentContactId },
-      });
-
-      if (!parent) {
-        throw new BadRequestException('Parent contact not found');
-      }
-    }
-
     // Hash password
     const hashedPassword = await this.hashPassword(password);
+
+    let parentContactId: string | null = null;
+
+    // If child, create or find parent contact
+    if (!isAdult) {
+      if (!parentName || !parentPhone || !parentEmail) {
+        throw new BadRequestException(
+          'Parent name, phone, and email are required for child accounts',
+        );
+      }
+
+      const parentContact = await this.prisma.parentContact.create({
+        data: {
+          parentName,
+          parentPhone,
+          parentEmail,
+          verificationCode: Math.random()
+            .toString(36)
+            .substring(2, 8)
+            .toUpperCase(),
+          isVerified: false,
+        },
+      });
+
+      parentContactId = parentContact.id;
+    } else {
+      // For adults, validate required fields
+      if (!phone || !physicalAddress) {
+        throw new BadRequestException(
+          'Phone number and physical address are required for adult accounts',
+        );
+      }
+    }
 
     // Create user
     const user = await this.prisma.user.create({
@@ -139,18 +112,20 @@ export class AuthService {
         password: hashedPassword,
         fullName,
         age,
-        role: UserRole.CHILD,
-        parentContactId: parent?.id || null,
-        isVerifiedByParent: !parent, // Needs verification if linked to parent
+        physicalAddress: isAdult ? physicalAddress : undefined,
+        role: isAdult ? UserRole.ADULT : UserRole.CHILD,
+        parentContactId: !isAdult ? parentContactId : undefined,
+        isVerifiedByParent: isAdult, // Adults verified by default
         gameProfile: {
           create: {
             language: 'ar',
-            contentRestriction: 'MILD', // Default stricter restriction for children
+            contentRestriction: isAdult ? 'NONE' : 'MILD',
           },
         },
       },
       include: {
         gameProfile: true,
+        parentContact: true,
       },
     });
 
@@ -171,14 +146,36 @@ export class AuthService {
       data: {
         userId: user.id,
         action: 'REGISTRATION',
-        details: { role: 'CHILD', parentLinked: !!parent },
+        details: {
+          role: isAdult ? 'ADULT' : 'CHILD',
+          ...(isAdult && { phone }),
+          ...(!isAdult && {
+            parentEmail,
+            verificationRequired: true,
+          }),
+        },
       },
     });
 
-    return {
+    const response: any = {
       user: this.sanitizeUser(user),
       token,
     };
+
+    // Add verification message for children
+    if (!isAdult) {
+      response.message =
+        'Child account created. Verification email sent to parent.';
+      response.verificationRequired = true;
+      response.parentContact = {
+        parentName: user.parentContact?.parentName,
+        parentEmail: user.parentContact?.parentEmail,
+      };
+    } else {
+      response.message = 'Adult account created successfully';
+    }
+
+    return response;
   }
 
   // Login user

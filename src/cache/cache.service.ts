@@ -32,13 +32,13 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     // await this.redis.quit(); // TEMPORARILY DISABLED
   }
 
-  async get(key: string): Promise<string | null> {
+  async get(_key: string): Promise<string | null> {
     // REDIS TEMPORARILY DISABLED - returns null
     return null;
     // return this.redis.get(key);
   }
 
-  async set(key: string, value: string, ttl?: number): Promise<void> {
+  async set(_key: string, _value: string, _ttl?: number): Promise<void> {
     // REDIS TEMPORARILY DISABLED - no-op
     return Promise.resolve();
     // if (ttl) {
@@ -48,43 +48,43 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     // }
   }
 
-  async del(key: string): Promise<void> {
+  async del(_key: string): Promise<void> {
     // REDIS TEMPORARILY DISABLED - no-op
     return Promise.resolve();
     // await this.redis.del(key);
   }
 
-  async hget(hash: string, field: string): Promise<string | null> {
+  async hget(_hash: string, _field: string): Promise<string | null> {
     // REDIS TEMPORARILY DISABLED - returns null
     return null;
     // return this.redis.hget(hash, field);
   }
 
-  async hset(hash: string, field: string, value: string): Promise<void> {
+  async hset(_hash: string, _field: string, _value: string): Promise<void> {
     // REDIS TEMPORARILY DISABLED - no-op
     return Promise.resolve();
     // await this.redis.hset(hash, field, value);
   }
 
-  async hdel(hash: string, field: string): Promise<void> {
+  async hdel(_hash: string, _field: string): Promise<void> {
     // REDIS TEMPORARILY DISABLED - no-op
     return Promise.resolve();
     // await this.redis.hdel(hash, field);
   }
 
-  async incr(key: string): Promise<number> {
+  async incr(_key: string): Promise<number> {
     // REDIS TEMPORARILY DISABLED - returns 0
     return 0;
     // return this.redis.incr(key);
   }
 
-  async expire(key: string, seconds: number): Promise<void> {
+  async expire(_key: string, _seconds: number): Promise<void> {
     // REDIS TEMPORARILY DISABLED - no-op
     return Promise.resolve();
     // await this.redis.expire(key, seconds);
   }
 
-  async keys(pattern: string): Promise<string[]> {
+  async keys(_pattern: string): Promise<string[]> {
     // REDIS TEMPORARILY DISABLED - returns empty array
     return [];
     // return this.redis.keys(pattern);
