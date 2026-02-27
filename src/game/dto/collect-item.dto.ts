@@ -1,4 +1,4 @@
-import { IsNumber, IsEnum, Min, Max } from 'class-validator';
+import { IsNumber, IsEnum, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CollectItemDto {
@@ -15,12 +15,12 @@ export class CollectItemDto {
   @ApiProperty({
     example: 'chocolate',
     description: 'Type of item to collect',
-    enum: ['chocolate', 'egg'],
+    enum: ['chocolate', 'egg', 'diamond', 'star', 'coin'],
   })
-  @IsEnum(['chocolate', 'egg'], {
-    message: 'itemType must be either "chocolate" or "egg"',
+  @IsEnum(['chocolate', 'egg', 'diamond', 'star', 'coin'], {
+    message: 'itemType must be one of: chocolate, egg, diamond, star, coin',
   })
-  itemType: 'chocolate' | 'egg';
+  itemType: 'chocolate' | 'egg' | 'diamond' | 'star' | 'coin';
 
   @ApiProperty({
     example: 0,
@@ -31,4 +31,12 @@ export class CollectItemDto {
   @IsNumber()
   @Min(0, { message: 'itemIndex must be >= 0' })
   itemIndex: number;
+
+  @ApiProperty({
+    example: false,
+    description: 'Optional: Skip server validation (for offline mode)',
+    type: Boolean,
+    required: false,
+  })
+  skipValidation?: boolean;
 }
