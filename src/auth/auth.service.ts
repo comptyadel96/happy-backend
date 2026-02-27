@@ -32,33 +32,18 @@ export class AuthService {
     return argon2.verify(hash, password);
   }
 
-  // Unified Register Method (Adult & Child)
+  // Unified Register Method
   async register(registerDto: RegisterDto) {
     const {
       email,
       password,
       fullName,
       age,
-      isAdult,
       phone,
       physicalAddress,
-      parentPhone,
-      parentEmail,
       parentName,
+      parentEmail,
     } = registerDto;
-
-    // Validate age range
-    if (isAdult && age < 18) {
-      throw new BadRequestException(
-        'Adult accounts require minimum age of 18',
-      );
-    }
-
-    if (!isAdult && age >= 16) {
-      throw new BadRequestException(
-        'Child accounts are for users under 16 years old',
-      );
-    }
 
     // Check if user exists
     const existingUser = await this.prisma.user.findUnique({
@@ -72,20 +57,31 @@ export class AuthService {
     // Hash password
     const hashedPassword = await this.hashPassword(password);
 
+    // Determine if user is adult (18+) or child (<18)
+    const isAdult = age >= 18;
     let parentContactId: string | null = null;
 
-    // If child, create or find parent contact
-    if (!isAdult) {
-      if (!parentName || !parentPhone || !parentEmail) {
+    // Validation based on age
+    if (isAdult) {
+      // For adults (18+), phone number and address are required
+      if (!phone || !physicalAddress) {
         throw new BadRequestException(
-          'Parent name, phone, and email are required for child accounts',
+          'Phone number and physical address are required for adults',
+        );
+      }
+    } else {
+      // For minors (<18), parent contact information is required
+      if (!parentName || !phone || !parentEmail) {
+        throw new BadRequestException(
+          'Parent name, parent phone number, and parent email are required for minors',
         );
       }
 
+      // Create parent contact for minors
       const parentContact = await this.prisma.parentContact.create({
         data: {
           parentName,
-          parentPhone,
+          parentPhone: phone,
           parentEmail,
           verificationCode: Math.random()
             .toString(36)
@@ -96,13 +92,6 @@ export class AuthService {
       });
 
       parentContactId = parentContact.id;
-    } else {
-      // For adults, validate required fields
-      if (!phone || !physicalAddress) {
-        throw new BadRequestException(
-          'Phone number and physical address are required for adult accounts',
-        );
-      }
     }
 
     // Create user
@@ -162,7 +151,7 @@ export class AuthService {
       token,
     };
 
-    // Add verification message for children
+    // Add verification message for minors
     if (!isAdult) {
       response.message =
         'Child account created. Verification email sent to parent.';

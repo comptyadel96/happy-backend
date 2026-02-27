@@ -26,8 +26,6 @@ export class GameGateway
   @WebSocketServer()
   server: Server;
 
-  private userConnections = new Map<string, string>(); // userId -> socketId
-
   constructor(
     private gameService: GameService,
     private prisma: PrismaService,
@@ -58,10 +56,10 @@ export class GameGateway
       client.data.userId = payload.sub || payload.userId;
       client.data.user = payload;
 
-      // Track user connection
-      this.userConnections.set(client.data.userId, client.id);
+      // Automatically join a personal room so any instance can emit specifically to this user
+      client.join(`user:${client.data.userId}`);
 
-      // Record WebSocket connection
+      // Record WebSocket connection in DB
       await this.prisma.webSocketConnection.create({
         data: {
           userId: client.data.userId,
@@ -88,7 +86,6 @@ export class GameGateway
     const userId = client.data.userId;
 
     if (userId) {
-      this.userConnections.delete(userId);
 
       // Update WebSocket connection record
       await this.prisma.webSocketConnection.updateMany({

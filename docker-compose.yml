@@ -1,35 +1,69 @@
 version: '3.8'
 
+# Production-ready compose for local multi-instance simulation.
+# On Hetzner VPS, each "app" service maps to one VPS node.
+# In real prod, remove the "mongodb" service (use MongoDB Atlas).
+
 services:
-  app:
+  # ─── Backend instances ────────────────────────────────────────────────────
+  app1:
     build: .
     ports:
-      - '3000:3000'
+      - '3001:3000'
     environment:
       DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
       JWT_SECRET: ${JWT_SECRET}
-      NODE_ENV: ${NODE_ENV}
-    depends_on:
-      - mongodb
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      INSTANCE_ID: app1
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    restart: unless-stopped
     networks:
       - happy-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health/redis',(r)=>{if(r.statusCode!==200)throw new Error()})"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
-  # Optional: Local MongoDB for development
-  mongodb:
-    image: mongo:7.0
+  app2:
+    build: .
     ports:
-      - '27017:27017'
+      - '3002:3000'
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      INSTANCE_ID: app2
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    restart: unless-stopped
+    networks:
+      - happy-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health/redis',(r)=>{if(r.statusCode!==200)throw new Error()})"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ─── Nginx load balancer ──────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - '80:80'
     volumes:
-      - mongodb-data:/data/db
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+    restart: unless-stopped
     networks:
       - happy-network
 
 networks:
   happy-network:
     driver: bridge
-
-volumes:
-  mongodb-data:

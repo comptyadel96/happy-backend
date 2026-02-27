@@ -5,8 +5,7 @@ import {
   IsNumber,
   Min,
   Max,
-  IsOptional,
-  IsBoolean,
+  ValidateIf,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -17,7 +16,7 @@ export class RegisterDto {
 
   @ApiProperty({
     example: 'SecurePassword123!',
-    description: 'Password (min 6 chars for children, 8 for adults)',
+    description: 'Password (minimum 6 characters)',
   })
   @IsString()
   @MinLength(6)
@@ -28,8 +27,8 @@ export class RegisterDto {
   fullName: string;
 
   @ApiProperty({
-    example: 35,
-    description: 'Age (18+ for adults, 1-15 for children)',
+    example: 25,
+    description: 'Age (1-120)',
   })
   @IsNumber()
   @Min(1)
@@ -37,56 +36,38 @@ export class RegisterDto {
   age: number;
 
   @ApiProperty({
-    example: true,
-    description: 'Is adult? (true = adult account, false = child account)',
-  })
-  @IsBoolean()
-  isAdult: boolean;
-
-  // Adult fields (required if isAdult = true)
-  @ApiProperty({
     example: '+33612345678',
-    description: 'Phone number (required for adults)',
+    description: 'Phone number (personal if 18+, parent phone if under 18)',
     required: false,
   })
-  @IsOptional()
+  @ValidateIf((o: RegisterDto) => true)
   @IsString()
   phone?: string;
 
   @ApiProperty({
-    example: '123 Rue de la Paix, 75000 Paris',
-    description: 'Physical address (required for adults)',
+    example: 'John Parent',
+    description: 'Parent name (required if under 18)',
     required: false,
   })
-  @IsOptional()
+  @ValidateIf((o: RegisterDto) => o.age < 18)
   @IsString()
-  physicalAddress?: string;
-
-  // Child fields (required if isAdult = false)
-  @ApiProperty({
-    example: '+33612345678',
-    description: 'Parent phone number (required for children)',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  parentPhone?: string;
+  parentName?: string;
 
   @ApiProperty({
     example: 'parent@example.com',
-    description: 'Parent email (required for children)',
+    description: 'Parent email (required if under 18)',
     required: false,
   })
-  @IsOptional()
+  @ValidateIf((o: RegisterDto) => o.age < 18)
   @IsEmail()
   parentEmail?: string;
 
   @ApiProperty({
-    example: 'John Doe',
-    description: 'Parent name (required for children)',
+    example: '123 Rue de la Paix, 75000 Paris',
+    description: 'Physical address (required if 18+)',
     required: false,
   })
-  @IsOptional()
+  @ValidateIf((o: RegisterDto) => o.age >= 18)
   @IsString()
-  parentName?: string;
+  physicalAddress?: string;
 }

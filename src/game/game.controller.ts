@@ -23,6 +23,28 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 export class GameController {
   constructor(private gameService: GameService) {}
 
+  @Get('profile')
+  @ApiOperation({ summary: 'Get current player game profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'Game profile retrieved successfully',
+  })
+  async getGameProfile(@Request() req) {
+    return this.gameService.getGameProfile(req.user.userId);
+  }
+
+  @Get('stats')
+  @ApiOperation({
+    summary: 'Get player statistics (score, eggs, chocolates, etc.)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Player statistics retrieved successfully',
+  })
+  async getPlayerStats(@Request() req) {
+    return this.gameService.getPlayerStats(req.user.userId);
+  }
+
   @Get('level/:levelId')
   @ApiOperation({ summary: 'Get level data and constraints' })
   @ApiResponse({

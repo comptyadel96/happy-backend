@@ -17,6 +17,68 @@ interface LevelCompletePayload {
 export class GameService {
   constructor(private prisma: PrismaService) {}
 
+  // Get game profile
+  async getGameProfile(userId: string) {
+    const gameProfile = await this.prisma.gameProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!gameProfile) {
+      return { success: false, error: 'Game profile not found' };
+    }
+
+    return {
+      success: true,
+      gameProfile,
+    };
+  }
+
+  // Get player statistics
+  async getPlayerStats(userId: string) {
+    const gameProfile = await this.prisma.gameProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!gameProfile) {
+      return { success: false, error: 'Game profile not found' };
+    }
+
+    const levelsData = gameProfile.levelsData as any;
+    let totalChocolates = 0;
+    let totalEggs = 0;
+    let completedLevels = 0;
+
+    // Calculate totals from all levels
+    Object.keys(levelsData).forEach((levelKey) => {
+      const level = levelsData[levelKey];
+      if (level.chocolatesTaken) {
+        totalChocolates += level.chocolatesTaken.length;
+      }
+      if (level.eggsTaken) {
+        totalEggs += level.eggsTaken.length;
+      }
+      if (level.completed) {
+        completedLevels += 1;
+      }
+    });
+
+    return {
+      success: true,
+      stats: {
+        totalScore: gameProfile.totalScore,
+        totalPlayTime: gameProfile.totalPlayTime,
+        currentLevel: gameProfile.currentLevel,
+        completedLevels,
+        totalChocolates,
+        totalEggs,
+        language: gameProfile.language,
+        soundEnabled: gameProfile.soundEnabled,
+        musicEnabled: gameProfile.musicEnabled,
+        lastPlayedAt: gameProfile.lastPlayedAt,
+      },
+    };
+  }
+
   // Get level data configuration
   async getLevelData(levelId: number) {
     return this.prisma.levelData.findUnique({

@@ -53,6 +53,8 @@ describe('AuthService', () => {
         password: 'Password123',
         fullName: 'Test User',
         physicalAddress: '123 Main St',
+        age: 30,
+        isAdult: true,
       };
 
       const mockUser = {
@@ -67,7 +69,7 @@ describe('AuthService', () => {
       jest.spyOn(prisma.user, 'create').mockResolvedValue(mockUser as any);
       jest.spyOn(jwtService, 'sign').mockReturnValue('token123');
 
-      const result = await service.registerAdult(registerDto);
+      const result = await service.register(registerDto);
 
       expect(result.token).toBe('token123');
       expect(result.user.email).toBe(registerDto.email);
@@ -80,11 +82,13 @@ describe('AuthService', () => {
         password: 'Password123',
         fullName: 'Test User',
         physicalAddress: '123 Main St',
+        age: 30,
+        isAdult: true,
       };
 
       jest.spyOn(prisma.user, 'findUnique').mockResolvedValue({} as any);
 
-      await expect(service.registerAdult(registerDto)).rejects.toThrow(
+      await expect(service.register(registerDto)).rejects.toThrow(
         ConflictException,
       );
     });
