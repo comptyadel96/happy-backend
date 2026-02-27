@@ -6,15 +6,24 @@ import {
   UseGuards,
   Request,
   Param,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiConsumes,
+  ApiProduces,
 } from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CollectItemDto } from './dto/collect-item.dto';
+import { CompleteLevelDto } from './dto/complete-level.dto';
+import { SyncGameStateDto } from './dto/sync-game-state.dto';
 
 @ApiTags('Game')
 @ApiBearerAuth('access-token')
@@ -23,92 +32,367 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 export class GameController {
   constructor(private gameService: GameService) {}
 
+  /**
+   * Retrieve the complete game profile for the authenticated player
+   * Returns all levelsData, inventory, missions, achievements, and player settings
+   */
   @Get('profile')
-  @ApiOperation({ summary: 'Get current player game profile' })
+  @ApiOperation({
+    summary: 'Get current player game profile',
+    description:
+      'Retrieves the complete game profile including all levels progress, inventory, missions, achievements, and player settings for the authenticated user.',
+  })
+  @ApiProduces('application/json')
   @ApiResponse({
     status: 200,
     description: 'Game profile retrieved successfully',
+    schema: {
+      example: {
+        success: true,
+        gameProfile: {
+          userId: 'user-123',
+          currentLevel: 5,
+          totalScore: 15000,
+          totalPlayTime: 3600,
+          language: 'en',
+          soundEnabled: true,
+          musicEnabled: true,
+          levelsData: {
+            level_1: {
+              chocolatesTaken: [0, 1, 2],
+              eggsTaken: [0],
+              completed: true,
+            },
+          },
+          lastPlayedAt: '2026-02-27T10:30:00Z',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing JWT token',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game profile not found for this user',
   })
   async getGameProfile(@Request() req) {
     return this.gameService.getGameProfile(req.user.userId);
   }
 
+  /**
+   * Retrieve aggregated player statistics
+   * Calculates totals for scores, eggs, chocolates, playtime, and level completion
+   */
   @Get('stats')
   @ApiOperation({
     summary: 'Get player statistics (score, eggs, chocolates, etc.)',
+    description:
+      'Calculates and returns aggregated player statistics including total score, total playtime, current level, completed levels count, total chocolates collected, and total eggs collected.',
   })
+  @ApiProduces('application/json')
   @ApiResponse({
     status: 200,
     description: 'Player statistics retrieved successfully',
+    schema: {
+      example: {
+        success: true,
+        stats: {
+          totalScore: 15000,
+          totalPlayTime: 3600,
+          currentLevel: 5,
+          completedLevels: 4,
+          totalChocolates: 42,
+          totalEggs: 15,
+          language: 'en',
+          soundEnabled: true,
+          musicEnabled: true,
+          lastPlayedAt: '2026-02-27T10:30:00Z',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing JWT token',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game profile not found for this user',
   })
   async getPlayerStats(@Request() req) {
     return this.gameService.getPlayerStats(req.user.userId);
   }
 
+  /**
+   * Retrieve configuration and constraints for a specific level
+   * Returns max items, difficulty, duration, rewards, etc.
+   */
   @Get('level/:levelId')
-  @ApiOperation({ summary: 'Get level data and constraints' })
+  @ApiOperation({
+    summary: 'Get level data and constraints',
+    description:
+      'Retrieves the configuration for a specific level including constraints, item limits, difficulty, rewards, and other level-specific settings.',
+  })
+  @ApiParam({
+    name: 'levelId',
+    type: Number,
+    description: 'The ID of the level to retrieve',
+    example: 1,
+  })
+  @ApiProduces('application/json')
   @ApiResponse({
     status: 200,
     description: 'Level data retrieved successfully',
+    schema: {
+      example: {
+        levelId: 1,
+        difficulty: 'easy',
+        maxChocolates: 5,
+        maxEggs: 3,
+        timeLimit: 120,
+        baseReward: 500,
+        description: 'The first level of the adventure',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing JWT token',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Level not found',
   })
   async getLevelData(@Param('levelId') levelId: string) {
     return this.gameService.getLevelData(parseInt(levelId));
   }
 
-  @Patch('sync')
-  @ApiOperation({ summary: 'Sync entire game state (offline to online)' })
-  @ApiResponse({
-    status: 200,
-    description: 'Game state synced successfully',
-  })
-  async syncGameState(
-    @Request() req,
-    @Body()
-    syncData: {
-      levelsData?: any;
-      inventory?: any;
-      missions?: any;
-      achievements?: any;
-      totalScore?: number;
-      totalPlayTime?: number;
-    },
-  ) {
-    return this.gameService.syncGameState(req.user.userId, syncData);
-  }
-
+  /**
+   * PATCH: Collect an item (chocolate or egg) in a level
+   * Validates collection constraints and updates player progress
+   * 
+   * Key validations:
+   * - Item index must be within level constraints
+   * - Cannot collect the same item twice
+   * - Cannot exceed max items per level
+   * - Level must exist in game data
+   */
   @Patch('item-collect')
-  @ApiOperation({ summary: 'Collect item in level' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Collect item in level (chocolate or egg)',
+    description:
+      'Records the collection of an item (chocolate or egg) at a specific location in a level. ' +
+      'Validates that the item exists, has not been collected before, and respects level constraints. ' +
+      'Updates player progress and game statistics.',
+  })
+  @ApiConsumes('application/json')
+  @ApiProduces('application/json')
+  @ApiBody({
+    type: CollectItemDto,
+    description: 'Item collection request',
+    examples: {
+      chocolate: {
+        summary: 'Collect a chocolate',
+        value: {
+          levelId: 1,
+          itemType: 'chocolate',
+          itemIndex: 0,
+        },
+      },
+      egg: {
+        summary: 'Collect an egg',
+        value: {
+          levelId: 1,
+          itemType: 'egg',
+          itemIndex: 0,
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
     description: 'Item collected successfully',
-  })
-  async collectItem(
-    @Request() req,
-    @Body()
-    data: {
-      levelId: number;
-      itemType: 'chocolate' | 'egg';
-      itemIndex: number;
+    schema: {
+      example: {
+        valid: true,
+        message: 'Item collected successfully',
+        levelProgress: {
+          chocolatesTaken: [0, 1, 2],
+          eggsTaken: [0],
+          completed: false,
+        },
+      },
     },
-  ) {
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid request - Item already collected or limits exceeded',
+    schema: {
+      example: {
+        valid: false,
+        error: 'Item already collected',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing JWT token',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Level not found in game data',
+  })
+  async collectItem(@Request() req, @Body() data: CollectItemDto) {
     return this.gameService.handleItemCollection(req.user.userId, data);
   }
 
+  /**
+   * PATCH: Mark a level as completed
+   * Records completion with score and playtime, updates progression
+   */
   @Patch('level-complete')
-  @ApiOperation({ summary: 'Mark level as completed' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Mark level as completed',
+    description:
+      'Records the completion of a level with the score achieved and time spent. ' +
+      'Updates player progression, total score, and playtime statistics. ' +
+      'May trigger new level unlocks or achievement checks.',
+  })
+  @ApiConsumes('application/json')
+  @ApiProduces('application/json')
+  @ApiBody({
+    type: CompleteLevelDto,
+    description: 'Level completion request',
+    examples: {
+      example1: {
+        summary: 'Complete level 1 with full score',
+        value: {
+          levelId: 1,
+          score: 2500,
+          timeSpent: 45,
+        },
+      },
+      example2: {
+        summary: 'Complete level 2 with partial score',
+        value: {
+          levelId: 2,
+          score: 1800,
+          timeSpent: 120,
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
-    description: 'Level completed successfully',
-  })
-  async completeLevel(
-    @Request() req,
-    @Body()
-    data: {
-      levelId: number;
-      score: number;
-      timeSpent: number;
+    description: 'Level marked as completed successfully',
+    schema: {
+      example: {
+        success: true,
+        message: 'Level completed successfully',
+        newStats: {
+          totalScore: 17500,
+          totalPlayTime: 3645,
+          currentLevel: 2,
+        },
+      },
     },
-  ) {
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing JWT token',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game profile or level not found',
+  })
+  async completeLevel(@Request() req, @Body() data: CompleteLevelDto) {
     return this.gameService.handleLevelComplete(req.user.userId, data);
+  }
+
+  /**
+   * PATCH: Synchronize entire game state
+   * Used for offline-to-online sync or full state restoration
+   * Merges or overwrites player data based on timestamps
+   */
+  @Patch('sync')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Sync entire game state (offline to online)',
+    description:
+      'Synchronizes the complete game state from the client to the server. ' +
+      'Used primarily for offline play sync, allowing players to resume offline progress online. ' +
+      'Validates all data before merging with server state. ' +
+      'Fields are optional - only provided fields will be updated.',
+  })
+  @ApiConsumes('application/json')
+  @ApiProduces('application/json')
+  @ApiBody({
+    type: SyncGameStateDto,
+    description: 'Game state synchronization request - all fields optional',
+    examples: {
+      fullSync: {
+        summary: 'Full game state sync',
+        value: {
+          levelsData: {
+            level_1: {
+              chocolatesTaken: [0, 1, 2],
+              eggsTaken: [0],
+              completed: true,
+            },
+            level_2: {
+              chocolatesTaken: [],
+              eggsTaken: [],
+              completed: false,
+            },
+          },
+          inventory: {
+            weapons: [],
+            potions: [],
+          },
+          missions: {},
+          achievements: {},
+          totalScore: 15000,
+          totalPlayTime: 3600,
+        },
+      },
+      partialSync: {
+        summary: 'Partial sync (only score and playtime)',
+        value: {
+          totalScore: 20000,
+          totalPlayTime: 5400,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Game state synced successfully',
+    schema: {
+      example: {
+        success: true,
+        message: 'Game state synced successfully',
+        syncedAt: '2026-02-27T10:35:00Z',
+        updatedFields: ['levelsData', 'totalScore', 'totalPlayTime'],
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid sync data format or validation failed',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing JWT token',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game profile not found for this user',
+  })
+  async syncGameState(@Request() req, @Body() syncData: SyncGameStateDto) {
+    return this.gameService.syncGameState(req.user.userId, syncData);
   }
 }
