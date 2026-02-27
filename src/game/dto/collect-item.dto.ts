@@ -1,4 +1,4 @@
-import { IsNumber, IsEnum, Min } from 'class-validator';
+import { IsNumber, IsEnum, Min, IsBoolean, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CollectItemDto {
@@ -38,5 +38,7 @@ export class CollectItemDto {
     type: Boolean,
     required: false,
   })
+  @IsOptional()
+  @IsBoolean()
   skipValidation?: boolean;
 }
