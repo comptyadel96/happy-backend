@@ -11,6 +11,7 @@
 ### What is the Item Collection System?
 
 The Item Collection System is a game mechanic that allows players to collect items (chocolate, eggs, diamonds, stars, coins) during gameplay. Each item has:
+
 - A point value
 - A collection limit per level
 - Duplicate prevention
@@ -270,6 +271,7 @@ Godot clears offline cache
 ### API Request/Response
 
 **Request** (CollectItemDto):
+
 ```typescript
 {
   levelId: number;           // Required: 1-999
@@ -280,6 +282,7 @@ Godot clears offline cache
 ```
 
 **Response**:
+
 ```typescript
 {
   valid?: boolean;              // Success indicator
@@ -349,12 +352,12 @@ PORT=3000
 
 ### CollectItemDto Validation
 
-| Field | Type | Rules | Example |
-|-------|------|-------|---------|
-| levelId | number | 1-9999 | 1 |
-| itemType | string | enum: ['chocolate','egg','diamond','star','coin'] | 'diamond' |
-| itemIndex | number | >= 0 | 0 |
-| skipValidation | boolean | Optional, false by default | true |
+| Field          | Type    | Rules                                             | Example   |
+| -------------- | ------- | ------------------------------------------------- | --------- |
+| levelId        | number  | 1-9999                                            | 1         |
+| itemType       | string  | enum: ['chocolate','egg','diamond','star','coin'] | 'diamond' |
+| itemIndex      | number  | >= 0                                              | 0         |
+| skipValidation | boolean | Optional, false by default                        | true      |
 
 ### Business Logic Validation
 
@@ -382,13 +385,13 @@ PORT=3000
 
 ### Response Times
 
-| Operation | Time | Notes |
-|-----------|------|-------|
-| Validate item | ~10ms | Checks array membership |
-| Handle collection | ~50ms | DB update included |
-| Get stats | ~30ms | Aggregates all levels |
-| Sync state | ~80ms | Merges offline data |
-| Complete level | ~70ms | Updates level data |
+| Operation         | Time  | Notes                   |
+| ----------------- | ----- | ----------------------- |
+| Validate item     | ~10ms | Checks array membership |
+| Handle collection | ~50ms | DB update included      |
+| Get stats         | ~30ms | Aggregates all levels   |
+| Sync state        | ~80ms | Merges offline data     |
+| Complete level    | ~70ms | Updates level data      |
 
 ### Database Operations
 
@@ -425,6 +428,7 @@ Stats Aggregation:
 **Problem**: Player collects items without internet
 
 **Solution**:
+
 1. Client detects offline condition
 2. Sets `skipValidation: true` in requests
 3. Backend accepts any valid format
@@ -432,6 +436,7 @@ Stats Aggregation:
 5. When internet returns, sends sync request
 
 **Example**:
+
 ```gdscript
 func on_internet_lost():
     offline_mode = true
@@ -445,12 +450,14 @@ func on_internet_restored():
 ### Conflict Resolution
 
 If offline data conflicts with server:
+
 1. Server data takes precedence
 2. Offline data merged into server state
 3. Duplicates removed automatically
 4. Score recalculated
 
 **Example**:
+
 ```
 Server has: [0, 1, 2] chocolates
 Offline collected: [2, 3, 4] chocolates
@@ -462,24 +469,28 @@ After sync: [0, 1, 2, 3, 4] (merged, deduplicated)
 ## 🧪 Testing Strategy
 
 ### Unit Tests
+
 - ✅ Validate each item type
 - ✅ Test duplicate prevention
 - ✅ Verify point calculation
 - ✅ Check limit enforcement
 
 ### Integration Tests
+
 - ✅ Collection → DB update
 - ✅ Completion → Level marked
 - ✅ Sync → Offline data merged
 - ✅ Stats → Correct aggregation
 
 ### E2E Tests
+
 - ✅ Full game flow
 - ✅ Offline → Online transition
 - ✅ Multiple levels
 - ✅ Concurrent requests
 
 ### Load Tests
+
 - ✅ 1000 concurrent collections
 - ✅ Batch operations
 - ✅ Database performance
@@ -542,13 +553,13 @@ logger.error(`Database error: ${error.message}`);
 
 ### Common Issues
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| "Item already collected" | Duplicate send | Debounce client requests |
-| "Max items exceeded" | Logic error | Adjust limits in constants |
-| "Level not found" | Missing levelData | FIXED in v2.0 |
-| Points not updating | Response not processed | Check earnedPoints in response |
-| Offline not syncing | skipValidation not set | Ensure flag in offline requests |
+| Issue                    | Cause                  | Solution                        |
+| ------------------------ | ---------------------- | ------------------------------- |
+| "Item already collected" | Duplicate send         | Debounce client requests        |
+| "Max items exceeded"     | Logic error            | Adjust limits in constants      |
+| "Level not found"        | Missing levelData      | FIXED in v2.0                   |
+| Points not updating      | Response not processed | Check earnedPoints in response  |
+| Offline not syncing      | skipValidation not set | Ensure flag in offline requests |
 
 ---
 
@@ -559,12 +570,14 @@ logger.error(`Database error: ${error.message}`);
 **No breaking changes!** ✅
 
 Backward compatible:
+
 - Old chocolate/egg still work
 - New items are optional
 - Default limits apply
 - Validation improved (no errors)
 
 **Upgrade Steps**:
+
 1. Deploy new backend code
 2. Update Godot client (optional)
 3. Add new item types to Godot (optional)

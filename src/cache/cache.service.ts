@@ -11,7 +11,9 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
       const redisUrl = process.env.REDIS_URL;
 
       if (!redisUrl) {
-        console.warn('[Cache] REDIS_URL not configured, cache will be disabled');
+        console.warn(
+          '[Cache] REDIS_URL not configured, cache will be disabled',
+        );
         this.isDisabled = true;
         return;
       }
@@ -44,7 +46,10 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
         console.log('[Cache] Redis Cloud connected and ready');
       }
     } catch (error) {
-      console.error('[Cache] Redis connection failed:', error instanceof Error ? error.message : error);
+      console.error(
+        '[Cache] Redis connection failed:',
+        error instanceof Error ? error.message : error,
+      );
       this.isDisabled = true;
     }
   }

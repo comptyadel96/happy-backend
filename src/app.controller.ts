@@ -1,5 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiProduces } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiProduces,
+} from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { CacheService } from './cache/cache.service';
 

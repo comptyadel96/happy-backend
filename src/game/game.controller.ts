@@ -172,7 +172,7 @@ export class GameController {
   /**
    * PATCH: Collect an item (chocolate or egg) in a level
    * Validates collection constraints and updates player progress
-   * 
+   *
    * Key validations:
    * - Item index must be within level constraints
    * - Cannot collect the same item twice

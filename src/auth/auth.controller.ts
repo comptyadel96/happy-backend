@@ -41,7 +41,7 @@ export class AuthController {
       '- physicalAddress\n\n' +
       '**Children (age < 18) require:**\n' +
       '- email, password, fullName, age\n' +
-      '- phone (parent\'s phone number)\n' +
+      "- phone (parent's phone number)\n" +
       '- parentName, parentEmail\n\n' +
       'Password must be at least 8 characters. Email must be unique.',
   })
