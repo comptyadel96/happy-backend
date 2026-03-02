@@ -415,4 +415,219 @@ export class GameService {
       gameProfile: updated,
     };
   }
+
+  // Submit level data from Godot game
+  async submitLevelData(userId: string, levelData: any) {
+    const gameProfile = await this.prisma.gameProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!gameProfile) {
+      return { success: false, error: 'Game profile not found' };
+    }
+
+    const levelId = levelData.levelId;
+    const levelsData = (gameProfile.levelsData as any) || {};
+
+    // Store complete level data from Godot
+    levelsData[levelId] = {
+      chokolata_collected: levelData.chokolata_collected,
+      eggs_collected: levelData.eggs_collected,
+      diamond_collected: levelData.diamond_collected,
+      time: levelData.time,
+      score: levelData.score,
+      chokolate_taked_ids: levelData.chokolate_taked_ids,
+      eggs_taked_ids: levelData.eggs_taked_ids,
+      diamonds_taked_ids: levelData.diamonds_taked_ids,
+      game_won: levelData.game_won,
+      level_unlocked: levelData.level_unlocked,
+      player_position_name: levelData.player_position_name,
+      happy_letters: levelData.happy_letters,
+      submittedAt: new Date().toISOString(),
+    };
+
+    const updated = await this.prisma.gameProfile.update({
+      where: { userId },
+      data: {
+        levelsData,
+        totalScore: gameProfile.totalScore + levelData.score,
+        totalPlayTime: gameProfile.totalPlayTime + levelData.time,
+        currentLevel: Math.max(gameProfile.currentLevel, levelId + 1),
+        lastPlayedAt: new Date(),
+      },
+    });
+
+    // Log activity
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: 'LEVEL_DATA_SUBMITTED',
+        details: {
+          levelId,
+          score: levelData.score,
+          time: levelData.time,
+          game_won: levelData.game_won,
+        },
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Level data submitted successfully',
+      levelId,
+      totalScore: updated.totalScore,
+    };
+  }
+
+  // Sync levels inventory (items collected per level)
+  async syncLevelsInventory(userId: string, levelsInventory: any) {
+    const gameProfile = await this.prisma.gameProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!gameProfile) {
+      return { success: false, error: 'Game profile not found' };
+    }
+
+    const updated = await this.prisma.gameProfile.update({
+      where: { userId },
+      data: {
+        levelsInventory,
+        lastPlayedAt: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Levels inventory synced',
+      levelsInventory: updated.levelsInventory,
+    };
+  }
+
+  // Sync levels states (triggers, doors, etc)
+  async syncLevelsStates(userId: string, levelsStates: any) {
+    const gameProfile = await this.prisma.gameProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!gameProfile) {
+      return { success: false, error: 'Game profile not found' };
+    }
+
+    const updated = await this.prisma.gameProfile.update({
+      where: { userId },
+      data: {
+        levelsStates,
+        lastPlayedAt: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Levels states synced',
+      levelsStates: updated.levelsStates,
+    };
+  }
+
+  // Sync levels missions
+  async syncLevelsMissions(userId: string, levelsMissions: any) {
+    const gameProfile = await this.prisma.gameProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!gameProfile) {
+      return { success: false, error: 'Game profile not found' };
+    }
+
+    const updated = await this.prisma.gameProfile.update({
+      where: { userId },
+      data: {
+        levelsMissions,
+        lastPlayedAt: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Levels missions synced',
+      levelsMissions: updated.levelsMissions,
+    };
+  }
+
+  // Sync game options
+  async syncGameOptions(userId: string, gameOptions: any) {
+    const gameProfile = await this.prisma.gameProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!gameProfile) {
+      return { success: false, error: 'Game profile not found' };
+    }
+
+    const updated = await this.prisma.gameProfile.update({
+      where: { userId },
+      data: {
+        gameOptions,
+        lastPlayedAt: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Game options synced',
+      gameOptions: updated.gameOptions,
+    };
+  }
+
+  // Sync game data (hints, skills, etc)
+  async syncGameData(userId: string, gameData: any) {
+    const gameProfile = await this.prisma.gameProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!gameProfile) {
+      return { success: false, error: 'Game profile not found' };
+    }
+
+    const updated = await this.prisma.gameProfile.update({
+      where: { userId },
+      data: {
+        gameData,
+        lastPlayedAt: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Game data synced',
+      gameData: updated.gameData,
+    };
+  }
+
+  // Get complete game state for Godot
+  async getCompleteGameState(userId: string) {
+    const gameProfile = await this.prisma.gameProfile.findUnique({
+      where: { userId },
+    });
+
+    if (!gameProfile) {
+      return { success: false, error: 'Game profile not found' };
+    }
+
+    return {
+      success: true,
+      gameState: {
+        levelsData: gameProfile.levelsData,
+        levelsInventory: gameProfile.levelsInventory,
+        levelsStates: gameProfile.levelsStates,
+        levelsMissions: gameProfile.levelsMissions,
+        gameOptions: gameProfile.gameOptions,
+        gameData: gameProfile.gameData,
+        currentLevel: gameProfile.currentLevel,
+        totalScore: gameProfile.totalScore,
+        totalPlayTime: gameProfile.totalPlayTime,
+        lastSyncAt: gameProfile.lastSyncAt,
+      },
+    };
+  }
 }

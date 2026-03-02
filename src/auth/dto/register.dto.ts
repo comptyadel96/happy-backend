@@ -45,6 +45,15 @@ export class RegisterDto {
   phone?: string;
 
   @ApiProperty({
+    example: 'Alger',
+    description: 'Wilaya (Province/Region in Algeria)',
+    required: false,
+  })
+  @ValidateIf((o: RegisterDto) => true)
+  @IsString()
+  wilaya?: string;
+
+  @ApiProperty({
     example: 'John Parent',
     description: 'Parent name (required if under 18)',
     required: false,

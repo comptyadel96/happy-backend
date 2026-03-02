@@ -65,6 +65,7 @@ model User {
   // Sensitive Data
   physicalAddress String?
   age             Int?
+  wilaya          String?  // Province/Region (Algérie)
   
   // Child account linkage
   parentContactId String?  @db.ObjectId
@@ -103,7 +104,12 @@ model GameProfile {
   totalPlayTime   Int      @default(0) // in seconds
   
   // Deeply nested JSON for game state
-  levelsData      Json     @default("{}") // Level progress with collected items
+  levelsData      Json     @default("{}") // Level progress data per level
+  levelsInventory Json     @default("{}") // Items per level (have/taked)
+  levelsStates    Json     @default("{}") // Level states/triggers
+  levelsMissions  Json     @default("{}") // Mission tracking per level
+  gameOptions     Json     @default("{}") // Game options (language, difficulty, etc)
+  gameData        Json     @default("{}") // Game data (hints, skills, etc)
   inventory       Json     @default("{}") // Player inventory
   missions        Json     @default("{}") // Mission tracking
   achievements    Json     @default("{}") // Achievements data

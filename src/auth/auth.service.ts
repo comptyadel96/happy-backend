@@ -41,6 +41,7 @@ export class AuthService {
       age,
       phone,
       physicalAddress,
+      wilaya,
       parentName,
       parentEmail,
     } = registerDto;
@@ -101,6 +102,7 @@ export class AuthService {
         password: hashedPassword,
         fullName,
         age,
+        wilaya,
         physicalAddress: isAdult ? physicalAddress : undefined,
         role: isAdult ? UserRole.ADULT : UserRole.CHILD,
         parentContactId: !isAdult ? parentContactId : undefined,
