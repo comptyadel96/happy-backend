@@ -11,6 +11,7 @@ Bienvenue! Ce guide vous aide à démarrer rapidement avec l'API de collecte d'o
 **Lire en priorité**: [GODOT_DEVELOPER_GUIDE.md](GODOT_DEVELOPER_GUIDE.md)
 
 Ce guide contient:
+
 - ✅ Structure de données recommandée (LevelData améliorée)
 - ✅ Architecture Godot proposée (GameManager, APIManager, etc)
 - ✅ Exemples complets de code GDScript
@@ -28,6 +29,7 @@ Ce guide contient:
 **Lire en priorité**: [SYSTEM_ARCHITECTURE.md](SYSTEM_ARCHITECTURE.md) et [README.md](README.md)
 
 Ce guide contient:
+
 - ✅ Architecture du système
 - ✅ Endpoints disponibles
 - ✅ Configuration et déploiement
@@ -44,16 +46,19 @@ Ce guide contient:
 **Étapes**:
 
 1. Vérifier la compilation
+
    ```bash
    npm run build
    ```
 
 2. Vérifier qu'aucune erreur n'existe
+
    ```bash
    Get-ChildItem *.md | Select-Object Name  # Voir les fichiers docs
    ```
 
 3. Déployer
+
    ```bash
    docker-compose up -d
    # ou
@@ -83,6 +88,7 @@ curl -X POST http://localhost:3000/auth/login \
 ```
 
 **Réponse**:
+
 ```json
 {
   "user": { ... },
@@ -106,6 +112,7 @@ curl -X PATCH http://localhost:3000/game/item-collect \
 ```
 
 **Réponse**:
+
 ```json
 {
   "valid": true,
@@ -142,6 +149,7 @@ curl -X PATCH http://localhost:3000/game/item-collect \
 ```
 
 **5 types d'objets** à collecter:
+
 - 💎 Diamant (100 pts) - Rare
 - ⭐ Étoile (50 pts) - Succès
 - 🥚 Œuf (25 pts) - Spécial
@@ -152,13 +160,13 @@ curl -X PATCH http://localhost:3000/game/item-collect \
 
 ## ✅ Statut du système
 
-| Composant | Statut | Notes |
-|-----------|--------|-------|
-| Backend | ✅ Prêt | Compilation: 0 erreurs |
-| API | ✅ Prêt | 4 endpoints testés |
-| Base de données | ✅ Prêt | MongoDB compatible |
-| Documentation | ✅ Complète | Guide Godot inclus |
-| Tests | ✅ Inclus | 15+ scénarios |
+| Composant       | Statut      | Notes                  |
+| --------------- | ----------- | ---------------------- |
+| Backend         | ✅ Prêt     | Compilation: 0 erreurs |
+| API             | ✅ Prêt     | 4 endpoints testés     |
+| Base de données | ✅ Prêt     | MongoDB compatible     |
+| Documentation   | ✅ Complète | Guide Godot inclus     |
+| Tests           | ✅ Inclus   | 15+ scénarios          |
 
 ---
 
@@ -288,7 +296,7 @@ A: ✅ 20+ exemples GDScript dans le guide!
 
 ## 🎉 Vous êtes prêt!
 
-Tout est configuré et prêt à l'emploi. 
+Tout est configuré et prêt à l'emploi.
 
 **Commencez par** [GODOT_DEVELOPER_GUIDE.md](GODOT_DEVELOPER_GUIDE.md) et suivez les instructions.
 

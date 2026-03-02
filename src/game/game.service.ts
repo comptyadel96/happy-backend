@@ -138,11 +138,16 @@ export class GameService {
 
     // Try to get level-specific constraints from database
     let levelData = await this.getLevelData(payload.levelId);
-    const maxItems = levelData
-      ? payload.itemType === 'chocolate'
-        ? levelData.maxChocolates
-        : levelData.maxEggs
-      : DEFAULT_LEVEL_CONSTRAINTS[payload.itemType];
+    
+    // In production, if level data is not found, return error
+    // This ensures levels are properly configured before accepting collection
+    if (!levelData) {
+      return { valid: false, error: 'Level not found' };
+    }
+
+    const maxItems = payload.itemType === 'chocolate'
+      ? levelData.maxChocolates
+      : levelData.maxEggs;
 
     // Map item type to collected array
     const itemTypeMap = {
@@ -278,6 +283,12 @@ export class GameService {
 
     if (!gameProfile) {
       return { success: false, error: 'Game profile not found' };
+    }
+
+    // Verify level exists in database
+    const levelData = await this.getLevelData(payload.levelId);
+    if (!levelData) {
+      return { success: false, error: 'Level not found' };
     }
 
     const levelsData = (gameProfile.levelsData as any) || {};

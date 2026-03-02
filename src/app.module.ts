@@ -8,10 +8,12 @@ import { GameModule } from './game/game.module';
 import { CacheModule } from './cache/cache.module';
 import { NotificationModule } from './notifications/notification.module';
 import { SessionModule } from './session/session.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
     PrismaModule,
+    DatabaseModule,
     AuthModule,
     UsersModule,
     GameModule,

@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
+import { DatabaseInitService } from './database/database-init.service';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import helmet from 'helmet';
@@ -39,6 +40,10 @@ async function bootstrap() {
   // Enable graceful shutdown
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
+
+  // Initialize database with seed data (needed especially in production)
+  const databaseInitService = app.get(DatabaseInitService);
+  await databaseInitService.initializeDatabase();
 
   app.enableCors({
     origin: '*', // À restreindre en prod plus tard

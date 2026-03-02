@@ -26,13 +26,13 @@ Le système de collecte d'objets permet aux joueurs de collecter **5 types d'ite
 
 ### Types d'items supportés
 
-| Item | Points | Max/Niveau | Utilité |
-|------|--------|------------|---------|
-| 🍫 **Chocolat** | 10 | 30 | Item courant |
-| 🥚 **Œuf** | 25 | 20 | Item spécial |
-| 💎 **Diamant** | 100 | 5 | Premium/rare |
-| ⭐ **Étoile** | 50 | 10 | Succès/objectif |
-| 🪙 **Pièce** | 1 | 100 | Monnaie |
+| Item            | Points | Max/Niveau | Utilité         |
+| --------------- | ------ | ---------- | --------------- |
+| 🍫 **Chocolat** | 10     | 30         | Item courant    |
+| 🥚 **Œuf**      | 25     | 20         | Item spécial    |
+| 💎 **Diamant**  | 100    | 5          | Premium/rare    |
+| ⭐ **Étoile**   | 50     | 10         | Succès/objectif |
+| 🪙 **Pièce**    | 1      | 100        | Monnaie         |
 
 ---
 
@@ -88,7 +88,7 @@ var game_data: Dictionary[StringName, Variant] = {
     "ledder_hint_show": true,
     "use_hint_show": true,
     "hang_hint_show": true,
-    
+
     # 🎮 Compétences débloquées
     "attack_skill": false,
     "climb_skill": false,
@@ -227,15 +227,15 @@ var collected: bool = false
 func _on_item_touched(body: Node) -> void:
     if collected or body.name != "Player":
         return
-    
+
     collected = true
     play_collection_animation()
-    
+
     if game_manager.is_offline:
         collect_offline()
     else:
         await collect_online()
-    
+
     queue_free()
 
 func collect_online() -> void:
@@ -244,7 +244,7 @@ func collect_online() -> void:
         item_type,
         item_index
     )
-    
+
     if result.valid:
         game_manager.item_collected.emit(item_type, result.earnedPoints)
     else:
@@ -259,7 +259,7 @@ func collect_offline() -> void:
         "timestamp": Time.get_ticks_msec()
     }
     game_manager.pending_collections.append(collection_data)
-    
+
     # Assume la collecte localement
     var points = ITEM_POINTS.get(item_type, 0)
     game_manager.item_collected.emit(item_type, points)
@@ -294,21 +294,21 @@ func collect_item(level_id: int, item_type: String, item_index: int, skip_valida
         "Authorization: Bearer " + GameManager.jwt_token,
         "Content-Type: application/json"
     ]
-    
+
     var payload = {
         "levelId": level_id,
         "itemType": item_type,
         "itemIndex": item_index,
         "skipValidation": skip_validation
     }
-    
+
     var http = HTTPRequest.new()
     add_child(http)
     http.request(url, headers, HTTPClient.METHOD_PATCH, JSON.stringify(payload))
-    
+
     var response = await http.request_completed
     http.queue_free()
-    
+
     if response[1] == 200:
         var data = JSON.parse_string(response[3].get_string_from_utf8())
         return {
@@ -329,20 +329,20 @@ func complete_level(level_id: int, score: int, time_spent: int) -> Dictionary:
         "Authorization: Bearer " + GameManager.jwt_token,
         "Content-Type: application/json"
     ]
-    
+
     var payload = {
         "levelId": level_id,
         "score": score,
         "timeSpent": time_spent
     }
-    
+
     var http = HTTPRequest.new()
     add_child(http)
     http.request(url, headers, HTTPClient.METHOD_PATCH, JSON.stringify(payload))
-    
+
     var response = await http.request_completed
     http.queue_free()
-    
+
     if response[1] == 200:
         return {"success": true}
     else:
@@ -351,29 +351,29 @@ func complete_level(level_id: int, score: int, time_spent: int) -> Dictionary:
 func sync_offline_data() -> Dictionary:
     if GameManager.pending_collections.is_empty():
         return {"success": true, "synced": 0}
-    
+
     # Prépare les données pour synchronisation
     var profile = await get_game_profile()
-    
+
     var url = API_BASE + "/game/sync"
     var headers = [
         "Authorization: Bearer " + GameManager.jwt_token,
         "Content-Type: application/json"
     ]
-    
+
     var payload = {
         "levelsData": profile.levelsData,
         "totalScore": profile.totalScore,
         "totalPlayTime": profile.totalPlayTime
     }
-    
+
     var http = HTTPRequest.new()
     add_child(http)
     http.request(url, headers, HTTPClient.METHOD_PATCH, JSON.stringify(payload))
-    
+
     var response = await http.request_completed
     http.queue_free()
-    
+
     if response[1] == 200:
         GameManager.pending_collections.clear()
         return {"success": true, "synced": len(GameManager.pending_collections)}
@@ -385,14 +385,14 @@ func get_game_profile() -> Dictionary:
     var headers = [
         "Authorization: Bearer " + GameManager.jwt_token
     ]
-    
+
     var http = HTTPRequest.new()
     add_child(http)
     http.request(url, headers, HTTPClient.METHOD_GET)
-    
+
     var response = await http.request_completed
     http.queue_free()
-    
+
     if response[1] == 200:
         return JSON.parse_string(response[3].get_string_from_utf8())
     else:
@@ -403,14 +403,14 @@ func get_player_stats() -> Dictionary:
     var headers = [
         "Authorization: Bearer " + GameManager.jwt_token
     ]
-    
+
     var http = HTTPRequest.new()
     add_child(http)
     http.request(url, headers, HTTPClient.METHOD_GET)
-    
+
     var response = await http.request_completed
     http.queue_free()
-    
+
     if response[1] == 200:
         return JSON.parse_string(response[3].get_string_from_utf8())
     else:
@@ -441,7 +441,7 @@ func _ready():
 
 func _check_connection() -> void:
     var is_online = await ping_server()
-    
+
     if is_online and !last_known_state:
         # Connexion rétablie
         connection_restored.emit()
@@ -450,21 +450,21 @@ func _check_connection() -> void:
         # Connexion perdue
         connection_lost.emit()
         GameManager.is_offline = true
-    
+
     last_known_state = is_online
 
 func ping_server() -> bool:
     var http = HTTPRequest.new()
     add_child(http)
     var error = http.request("http://localhost:3000")
-    
+
     if error != OK:
         http.queue_free()
         return false
-    
+
     var response = await http.request_completed
     http.queue_free()
-    
+
     return response[1] != 0 if response else false
 ```
 
@@ -492,19 +492,19 @@ func should_sync() -> bool:
         return false
     if GameManager.pending_collections.is_empty():
         return false
-    
+
     var time_since_last = Time.get_ticks_msec() - last_sync
     return time_since_last >= sync_interval
 
 func sync_now() -> void:
     if sync_in_progress:
         return
-    
+
     sync_in_progress = true
-    
+
     var total = len(GameManager.pending_collections)
     var synced = 0
-    
+
     for collection in GameManager.pending_collections:
         var result = await APIManager.collect_item(
             collection.level,
@@ -512,18 +512,18 @@ func sync_now() -> void:
             collection.index,
             false  # Validation activée pour sync
         )
-        
+
         if result.valid:
             synced += 1
-        
+
         sync_progress.emit(synced, total)
-    
+
     # Synchronise l'état global
     var sync_result = await APIManager.sync_offline_data()
-    
+
     sync_in_progress = false
     last_sync = Time.get_ticks_msec()
-    
+
     if sync_result.success:
         sync_completed.emit(true, "✅ %d objets synchronisés" % synced)
     else:
@@ -554,15 +554,15 @@ func handle_collection_error(error_message: String) -> ErrorType:
         "item already collected":
             show_error("❌ Cet objet a déjà été collecté!")
             return ErrorType.ALREADY_COLLECTED
-        
+
         _ if "maximum" in error_message.to_lower() and "exceeds" in error_message.to_lower():
             show_error("❌ Limite d'objets atteinte pour ce niveau")
             return ErrorType.LIMIT_EXCEEDED
-        
+
         "level not found":
             show_error("❌ Ce niveau n'existe pas")
             return ErrorType.INVALID_LEVEL
-        
+
         _:
             show_error("❌ Erreur: " + error_message)
             return ErrorType.UNKNOWN
