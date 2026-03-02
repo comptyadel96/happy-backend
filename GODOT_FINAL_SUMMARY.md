@@ -8,6 +8,7 @@
 ## ✅ Objectifs Réalisés
 
 ### 1. ✅ Structures de Données Godot
+
 - **10 niveaux** supportés avec données complètes
 - **Collectibles**: chocolats (30 max), oeufs (2-20 max), diamants (1-2 max)
 - **Happy Letters**: H, A, P, P2, Y
@@ -15,6 +16,7 @@
 - **Score et temps**: Suivi automatique pour chaque niveau
 
 ### 2. ✅ Endpoints API (7 nouveaux)
+
 ```
 POST   /game/level/submit          Soumettre données complètes d'un niveau
 PATCH  /game/levels/inventory      Synchroniser items/inventory
@@ -26,18 +28,21 @@ GET    /game/state                 Récupérer état complet du jeu
 ```
 
 ### 3. ✅ Champ Wilaya
+
 - Ajouté au schéma `User`
 - Optionnel lors de l'enregistrement
 - Stocké pour les statistiques régionales (Algérie)
 - Compatible adultes et enfants
 
 ### 4. ✅ Validation des Données
+
 - Classes DTO avec `class-validator`
 - Swagger documentation avec exemples
 - Codes d'erreur HTTP appropriés
 - Gestion offline avec `skipValidation`
 
 ### 5. ✅ Documentation Complète
+
 - **GODOT_API_GUIDE.md**: Guide complet avec exemples
 - **GODOT_INTEGRATION_SUMMARY.md**: Résumé des changements
 - **GODOT_USAGE_EXAMPLES.md**: Exemples cURL et JSON
@@ -48,6 +53,7 @@ GET    /game/state                 Récupérer état complet du jeu
 ## 📁 Fichiers Créés/Modifiés
 
 ### Créés:
+
 ```
 ✨ src/game/dto/level-data.dto.ts          Structures de données de niveau
 ✨ src/game/dto/game-state.dto.ts          Structures de synchronisation
@@ -57,6 +63,7 @@ GET    /game/state                 Récupérer état complet du jeu
 ```
 
 ### Modifiés:
+
 ```
 🔧 prisma/schema.prisma                    +wilaya, +niveaux JSON
 🔧 src/auth/dto/register.dto.ts            +wilaya field
@@ -70,22 +77,24 @@ GET    /game/state                 Récupérer état complet du jeu
 ## 🗂️ Structure de Données
 
 ### Limites par Niveau
+
 ```json
 {
-  "1": {"chokolate_max": 30, "diamond_max": 2, "eggs_max": 2},
-  "2": {"chokolate_max": 30, "diamond_max": 2, "eggs_max": 2},
-  "3": {"chokolate_max": 20, "diamond_max": 1, "eggs_max": 2},
-  "4": {"chokolate_max": 40, "diamond_max": 1, "eggs_max": 2},
-  "5": {"chokolate_max": 20, "diamond_max": 1, "eggs_max": 2},
-  "6": {"chokolate_max": 40, "diamond_max": 1, "eggs_max": 2},
-  "7": {"chokolate_max": 20, "diamond_max": 1, "eggs_max": 2},
-  "8": {"chokolate_max": 40, "diamond_max": 1, "eggs_max": 2},
-  "9": {"chokolate_max": 30, "diamond_max": 1, "eggs_max": 20},
-  "10": {"chokolate_max": 30, "diamond_max": 2, "eggs_max": 2}
+  "1": { "chokolate_max": 30, "diamond_max": 2, "eggs_max": 2 },
+  "2": { "chokolate_max": 30, "diamond_max": 2, "eggs_max": 2 },
+  "3": { "chokolate_max": 20, "diamond_max": 1, "eggs_max": 2 },
+  "4": { "chokolate_max": 40, "diamond_max": 1, "eggs_max": 2 },
+  "5": { "chokolate_max": 20, "diamond_max": 1, "eggs_max": 2 },
+  "6": { "chokolate_max": 40, "diamond_max": 1, "eggs_max": 2 },
+  "7": { "chokolate_max": 20, "diamond_max": 1, "eggs_max": 2 },
+  "8": { "chokolate_max": 40, "diamond_max": 1, "eggs_max": 2 },
+  "9": { "chokolate_max": 30, "diamond_max": 1, "eggs_max": 20 },
+  "10": { "chokolate_max": 30, "diamond_max": 2, "eggs_max": 2 }
 }
 ```
 
 ### States par Niveau
+
 ```
 Niveau 1: BarnDoor, CaveFarmDoor
 Niveau 2: LeverElectricity
@@ -100,6 +109,7 @@ Niveau 6: CaveCompleted
 ## 🔐 Authentification
 
 ### Enregistrement Mise à Jour
+
 ```javascript
 POST /auth/register
 {
@@ -114,6 +124,7 @@ POST /auth/register
 ```
 
 ### Token JWT
+
 - Durée: 7 jours
 - Bearer: `Authorization: Bearer {token}`
 - Utilisé pour tous les endpoints `/game/*`
@@ -203,6 +214,7 @@ Response 201:
 ## 📝 Métadonnées Automatiques
 
 Chaque synchronisation enregistre automatiquement:
+
 - `lastSyncAt`: Timestamp de dernière synchronisation
 - `lastPlayedAt`: Timestamp de dernier jeu
 - `totalScore`: Score cumulé
@@ -227,12 +239,15 @@ PATCH /game/sync              Synchronisation globale (legacy)
 ## 🧪 Testable Immédiatement
 
 ### 1. Via Swagger
+
 ```
 http://localhost:3000/api/docs
 ```
+
 Tous les nouveaux endpoints sont documentés avec exemples
 
 ### 2. Via cURL
+
 ```bash
 # Enregistrement
 curl -X POST "http://localhost:3000/auth/register" \
@@ -247,6 +262,7 @@ curl -X POST "http://localhost:3000/game/level/submit" \
 ```
 
 ### 3. Via Postman
+
 - Importer depuis Swagger JSON
 - Token JWT auto-géré
 - Collections prêtes à l'emploi
@@ -274,12 +290,12 @@ curl -X POST "http://localhost:3000/game/level/submit" \
 
 ## 📞 Support & Documentation
 
-| Document | Contenu |
-|----------|---------|
-| **GODOT_API_GUIDE.md** | Guide complet API avec exemples |
-| **GODOT_USAGE_EXAMPLES.md** | Exemples cURL et JSON |
+| Document                         | Contenu                          |
+| -------------------------------- | -------------------------------- |
+| **GODOT_API_GUIDE.md**           | Guide complet API avec exemples  |
+| **GODOT_USAGE_EXAMPLES.md**      | Exemples cURL et JSON            |
 | **GODOT_INTEGRATION_SUMMARY.md** | Résumé technique des changements |
-| **Swagger** | Documentation interactive |
+| **Swagger**                      | Documentation interactive        |
 
 ---
 

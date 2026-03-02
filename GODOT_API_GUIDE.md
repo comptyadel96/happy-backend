@@ -52,17 +52,20 @@ Cet API fournit les endpoints nécessaires pour synchroniser et gérer l'état d
 ## Endpoints API
 
 ### 1. Soumettre les données d'un niveau
+
 **POST** `/game/level/submit`
 
 Envoie les données complètes d'un niveau après sa completion.
 
 **Headers requis:**
+
 ```
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
 
 **Body:**
+
 ```json
 {
   "levelId": 1,
@@ -88,6 +91,7 @@ Content-Type: application/json
 ```
 
 **Response (201):**
+
 ```json
 {
   "success": true,
@@ -100,17 +104,20 @@ Content-Type: application/json
 ---
 
 ### 2. Synchroniser l'inventaire des niveaux
+
 **PATCH** `/game/levels/inventory`
 
 Synchronise les items disponibles et collectés pour chaque niveau.
 
 **Headers requis:**
+
 ```
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
 
 **Body:**
+
 ```json
 {
   "2": {
@@ -133,6 +140,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -144,17 +152,20 @@ Content-Type: application/json
 ---
 
 ### 3. Synchroniser les états des niveaux
+
 **PATCH** `/game/levels/states`
 
 Synchronise les états des portes, leviers, plateformes et autres triggers.
 
 **Headers requis:**
+
 ```
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
 
 **Body:**
+
 ```json
 {
   "1": { "BarnDoor": false, "CaveFarmDoor": false },
@@ -167,6 +178,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -178,17 +190,20 @@ Content-Type: application/json
 ---
 
 ### 4. Synchroniser les missions des niveaux
+
 **PATCH** `/game/levels/missions`
 
 Synchronise la progression des missions par niveau.
 
 **Headers requis:**
+
 ```
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
 
 **Body:**
+
 ```json
 {
   "1": { "StrangerImage": false }
@@ -196,6 +211,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -207,17 +223,20 @@ Content-Type: application/json
 ---
 
 ### 5. Synchroniser les options du jeu
+
 **PATCH** `/game/options`
 
 Synchronise les options globales du jeu (langue, position sur la carte, etc).
 
 **Headers requis:**
+
 ```
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
 
 **Body:**
+
 ```json
 {
   "first_time_play": true,
@@ -227,6 +246,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -238,17 +258,20 @@ Content-Type: application/json
 ---
 
 ### 6. Synchroniser les données du jeu
+
 **PATCH** `/game/data`
 
 Synchronise les données du jeu comme les indices affichés et les compétences débloquées.
 
 **Headers requis:**
+
 ```
 Authorization: Bearer {access_token}
 Content-Type: application/json
 ```
 
 **Body:**
+
 ```json
 {
   "movment_hint_show": true,
@@ -261,6 +284,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -272,16 +296,19 @@ Content-Type: application/json
 ---
 
 ### 7. Récupérer l'état complet du jeu
+
 **GET** `/game/state`
 
 Récupère l'état complet du jeu pour synchroniser le client Godot au démarrage ou après reconnexion.
 
 **Headers requis:**
+
 ```
 Authorization: Bearer {access_token}
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -303,6 +330,7 @@ Authorization: Bearer {access_token}
 ---
 
 ### 8. Profil du jeu (existant)
+
 **GET** `/game/profile`
 
 Récupère le profil complet du jeu du joueur.
@@ -310,6 +338,7 @@ Récupère le profil complet du jeu du joueur.
 ---
 
 ### 9. Statistiques du joueur (existant)
+
 **GET** `/game/stats`
 
 Récupère les statistiques agrégées du joueur.
@@ -317,6 +346,7 @@ Récupère les statistiques agrégées du joueur.
 ---
 
 ### 10. Synchroniser tout l'état du jeu (existant)
+
 **PATCH** `/game/sync`
 
 Synchronise l'état complet du jeu (ancien endpoint compatible).
@@ -326,11 +356,13 @@ Synchronise l'état complet du jeu (ancien endpoint compatible).
 ## Points d'enregistrement et données Wilaya
 
 ### Enregistrement avec Wilaya
+
 **POST** `/auth/register`
 
 L'enregistrement inclut maintenant le champ `wilaya` (région/province).
 
 **Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -348,12 +380,15 @@ L'enregistrement inclut maintenant le champ `wilaya` (région/province).
 ## Flux d'utilisation recommandé
 
 ### 1. Au démarrage du jeu
+
 - Appeler `GET /game/state` pour charger l'état du jeu sauvegardé
 
 ### 2. Après chaque niveau complété
+
 - Appeler `POST /game/level/submit` avec les données du niveau
 
 ### 3. Synchronisation périodique ou à la demande
+
 - Appeler `PATCH /game/levels/inventory` pour synchroniser l'inventaire
 - Appeler `PATCH /game/levels/states` pour synchroniser les états
 - Appeler `PATCH /game/levels/missions` pour synchroniser les missions
@@ -361,6 +396,7 @@ L'enregistrement inclut maintenant le champ `wilaya` (région/province).
 - Appeler `PATCH /game/data` si les données du jeu ont changé
 
 ### 4. Avant de quitter
+
 - Appeler `GET /game/profile` pour vérifier la sauvegarde
 - Ou appeler `PATCH /game/sync` pour une synchronisation globale d'urgence
 
@@ -368,15 +404,15 @@ L'enregistrement inclut maintenant le champ `wilaya` (région/province).
 
 ## Codes d'erreur HTTP
 
-| Code | Signification |
-|------|--------------|
-| 200 | Succès |
-| 201 | Créé avec succès |
-| 400 | Données invalides |
-| 401 | Non authentifié (token invalide ou absent) |
-| 404 | Ressource non trouvée |
-| 409 | Conflit (ex: email déjà utilisé) |
-| 500 | Erreur serveur |
+| Code | Signification                              |
+| ---- | ------------------------------------------ |
+| 200  | Succès                                     |
+| 201  | Créé avec succès                           |
+| 400  | Données invalides                          |
+| 401  | Non authentifié (token invalide ou absent) |
+| 404  | Ressource non trouvée                      |
+| 409  | Conflit (ex: email déjà utilisé)           |
+| 500  | Erreur serveur                             |
 
 ---
 

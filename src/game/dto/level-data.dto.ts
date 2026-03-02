@@ -1,4 +1,12 @@
-import { IsInt, IsArray, IsBoolean, IsString, IsObject, Min, Max } from 'class-validator';
+import {
+  IsInt,
+  IsArray,
+  IsBoolean,
+  IsString,
+  IsObject,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class HappyLettersDto {
@@ -70,9 +78,9 @@ export class LevelDataDto {
   @IsBoolean()
   level_unlocked: boolean;
 
-  @ApiProperty({ 
-    example: 'checkpoint_1', 
-    description: 'Player checkpoint position name'
+  @ApiProperty({
+    example: 'checkpoint_1',
+    description: 'Player checkpoint position name',
   })
   @IsString()
   player_position_name: string;

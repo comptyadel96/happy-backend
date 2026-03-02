@@ -1,6 +1,7 @@
 # Exemples d'Utilisation - API Godot
 
 ## Table des matières
+
 1. [Authentification](#authentification)
 2. [Charge Initiale](#charge-initiale)
 3. [Soumission de Niveau](#soumission-de-niveau)
@@ -17,6 +18,7 @@
 **URL**: `POST /auth/register`
 
 **Exemple d'enregistrement (Adulte en Algérie):**
+
 ```json
 {
   "email": "joueur@example.dz",
@@ -30,6 +32,7 @@
 ```
 
 **Response (200):**
+
 ```json
 {
   "user": {
@@ -49,6 +52,7 @@
 ### 2. Enregistrement (Enfant)
 
 **Exemple d'enregistrement (Enfant en Algérie):**
+
 ```json
 {
   "email": "enfant@example.dz",
@@ -67,6 +71,7 @@
 **URL**: `POST /auth/login`
 
 **Request:**
+
 ```json
 {
   "email": "joueur@example.dz",
@@ -75,9 +80,12 @@
 ```
 
 **Response:**
+
 ```json
 {
-  "user": { /* ... */ },
+  "user": {
+    /* ... */
+  },
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "expires_in": 604800
 }
@@ -92,12 +100,14 @@
 **URL**: `GET /game/state`
 
 **Headers:**
+
 ```
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -172,12 +182,14 @@ Content-Type: application/json
 **URL**: `POST /game/level/submit`
 
 **Headers:**
+
 ```
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 Content-Type: application/json
 ```
 
 **Request (Niveau 1 - Complet):**
+
 ```json
 {
   "levelId": 1,
@@ -187,12 +199,36 @@ Content-Type: application/json
   "time": 125,
   "score": 8500,
   "chokolate_taked_ids": [
-    true, true, true, true, true,
-    true, true, true, true, true,
-    true, true, true, true, true,
-    true, true, true, true, true,
-    true, true, true, true, true,
-    true, true, true, true, true
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
   ],
   "eggs_taked_ids": [true, true],
   "diamonds_taked_ids": [true, true],
@@ -210,6 +246,7 @@ Content-Type: application/json
 ```
 
 **Response (201):**
+
 ```json
 {
   "success": true,
@@ -220,6 +257,7 @@ Content-Type: application/json
 ```
 
 **Request (Niveau 2 - Partiel):**
+
 ```json
 {
   "levelId": 2,
@@ -229,9 +267,21 @@ Content-Type: application/json
   "time": 180,
   "score": 5200,
   "chokolate_taked_ids": [
-    true, true, true, true, true,
-    true, true, true, true, true,
-    true, true, true, true, true
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
   ],
   "eggs_taked_ids": [true],
   "diamonds_taked_ids": [true],
@@ -249,6 +299,7 @@ Content-Type: application/json
 ```
 
 **Response (201):**
+
 ```json
 {
   "success": true,
@@ -267,6 +318,7 @@ Content-Type: application/json
 **URL**: `PATCH /game/levels/inventory`
 
 **Request:**
+
 ```json
 {
   "1": {
@@ -295,6 +347,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -310,6 +363,7 @@ Content-Type: application/json
 **URL**: `PATCH /game/levels/states`
 
 **Request:**
+
 ```json
 {
   "1": {
@@ -341,6 +395,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -356,6 +411,7 @@ Content-Type: application/json
 **URL**: `PATCH /game/levels/missions`
 
 **Request:**
+
 ```json
 {
   "1": {
@@ -369,6 +425,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -384,6 +441,7 @@ Content-Type: application/json
 **URL**: `PATCH /game/options`
 
 **Request:**
+
 ```json
 {
   "first_time_play": false,
@@ -393,6 +451,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -408,6 +467,7 @@ Content-Type: application/json
 **URL**: `PATCH /game/data`
 
 **Request:**
+
 ```json
 {
   "movment_hint_show": true,
@@ -420,6 +480,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -440,6 +501,7 @@ Content-Type: application/json
 **URL**: `PATCH /game/sync` (endpoint legacy compatible)
 
 **Request (Sync complet après offline):**
+
 ```json
 {
   "levelsData": {
@@ -490,6 +552,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,

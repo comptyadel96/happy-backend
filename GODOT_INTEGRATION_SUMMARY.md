@@ -9,10 +9,13 @@
 ## 1. Schéma Prisma (`prisma/schema.prisma`)
 
 ### Ajouts au modèle `User`:
+
 - `wilaya?: String` - Champ pour la région/province (Algérie)
 
 ### Ajouts au modèle `GameProfile`:
+
 Remplacé les champs génériques par des champs spécifiques à Godot:
+
 ```prisma
 levelsData      Json  // Données complètes de chaque niveau
 levelsInventory Json  // Items collectés par niveau (have/taked)
@@ -27,19 +30,24 @@ gameData        Json  // Données du jeu (hints, skills, etc)
 ## 2. Fichiers DTO créés
 
 ### `src/game/dto/level-data.dto.ts`
+
 Nouvelle classe pour structurer les données de niveau:
+
 - `LevelDataDto`: Structure complète d'un niveau
 - `HappyLettersDto`: Structure des 5 lettres "HAPPY"
 - `SubmitLevelDataDto`: Wrapper pour soumission
 
 **Spécifications incluses:**
+
 - 10 niveaux max supportés
 - Collectibles: chocolats, oeufs, diamants
 - Happy letters: H, A, P, P2, Y
 - Checkpoint pour reprendre
 
 ### `src/game/dto/game-state.dto.ts`
+
 Classes pour synchroniser l'état du jeu:
+
 - `GameOptionsDto`: Options globales (langue, position)
 - `GameDataDto`: Données du jeu (hints, skills)
 - `SyncGameStateDto`: Synchronisation complète
@@ -51,7 +59,9 @@ Classes pour synchroniser l'état du jeu:
 ## 3. Mise à jour des DTOs existants
 
 ### `src/auth/dto/register.dto.ts`
+
 Ajout du champ `wilaya`:
+
 - Champ optionnel pour tous les utilisateurs
 - Stocké lors de l'enregistrement
 - Utilisable pour les statistiques régionales
@@ -97,17 +107,18 @@ Ajout du champ `wilaya`:
 
 ### Nouveaux endpoints:
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/game/level/submit` | Soumettre données complètes d'un niveau |
-| PATCH | `/game/levels/inventory` | Synchroniser inventaire des niveaux |
-| PATCH | `/game/levels/states` | Synchroniser états des niveaux |
-| PATCH | `/game/levels/missions` | Synchroniser missions des niveaux |
-| PATCH | `/game/options` | Synchroniser options du jeu |
-| PATCH | `/game/data` | Synchroniser données du jeu |
-| GET | `/game/state` | Récupérer état complet pour Godot |
+| Méthode | Endpoint                 | Description                             |
+| ------- | ------------------------ | --------------------------------------- |
+| POST    | `/game/level/submit`     | Soumettre données complètes d'un niveau |
+| PATCH   | `/game/levels/inventory` | Synchroniser inventaire des niveaux     |
+| PATCH   | `/game/levels/states`    | Synchroniser états des niveaux          |
+| PATCH   | `/game/levels/missions`  | Synchroniser missions des niveaux       |
+| PATCH   | `/game/options`          | Synchroniser options du jeu             |
+| PATCH   | `/game/data`             | Synchroniser données du jeu             |
+| GET     | `/game/state`            | Récupérer état complet pour Godot       |
 
 ### Documentation Swagger:
+
 - Tous les endpoints incluent des exemples d'utilisation
 - Codes d'erreur HTTP documentés
 - Descriptions complètes des champs
@@ -117,6 +128,7 @@ Ajout du champ `wilaya`:
 ## 6. Mise à jour du Service d'Auth (`src/auth/auth.service.ts`)
 
 ### Changements:
+
 - Extraire le champ `wilaya` du DTO
 - Stocker `wilaya` lors de la création de l'utilisateur
 - Compatible avec les enregistrements adultes et mineurs
@@ -126,7 +138,9 @@ Ajout du champ `wilaya`:
 ## 7. Documentation créée
 
 ### `GODOT_API_GUIDE.md`
+
 Guide complet pour le développeur Godot incluant:
+
 - Structure des données pour 10 niveaux
 - Limites maximales par niveau
 - Exemples de tous les endpoints
@@ -140,6 +154,7 @@ Guide complet pour le développeur Godot incluant:
 ## 8. Structure des Données Godot
 
 ### Limites par niveau (tableau complet):
+
 ```
 Niveau 1-2: 30 chocolats, 2 diamants, 2 oeufs
 Niveau 3,5,7: 20 chocolats, 1 diamant, 2 oeufs
@@ -149,6 +164,7 @@ Niveau 10: 30 chocolats, 2 diamants, 2 oeufs
 ```
 
 ### Elements spéciaux par niveau:
+
 - **Niveau 1**: BarnDoor, CaveFarmDoor
 - **Niveau 2**: LeverElectricity
 - **Niveau 3**: LeverRight, LeverStock, PlatformDoor
@@ -157,9 +173,11 @@ Niveau 10: 30 chocolats, 2 diamants, 2 oeufs
 - **Niveau 6**: CaveCompleted
 
 ### Missions:
+
 - Actuellement une seule mission: "StrangerImage" au niveau 1
 
 ### Happy Letters:
+
 - H, A, P, P2, Y collectables dans les niveaux
 
 ---

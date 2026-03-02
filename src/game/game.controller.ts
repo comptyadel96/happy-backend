@@ -531,7 +531,10 @@ export class GameController {
     description: 'Game profile not found for this user',
   })
   async syncLevelsInventory(@Request() req, @Body() levelsInventory: any) {
-    return this.gameService.syncLevelsInventory(req.user.userId, levelsInventory);
+    return this.gameService.syncLevelsInventory(
+      req.user.userId,
+      levelsInventory,
+    );
   }
 
   /**
