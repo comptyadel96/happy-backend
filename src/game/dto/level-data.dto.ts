@@ -4,9 +4,11 @@ import {
   IsBoolean,
   IsString,
   IsObject,
+  ValidateNested,
   Min,
   Max,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class HappyLettersDto {
@@ -86,6 +88,9 @@ export class LevelDataDto {
   player_position_name: string;
 
   @ApiProperty({ description: 'Happy letters collected' })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => HappyLettersDto)
   happy_letters: HappyLettersDto;
 }
 
