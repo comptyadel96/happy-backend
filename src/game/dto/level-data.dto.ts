@@ -60,29 +60,29 @@ export class LevelDataDto {
   @Min(0)
   score: number;
 
-  @ApiProperty({ example: [true, true, false, false, true] })
+  @ApiProperty({ example: [true, true, false, false, true], description: 'Array indicating which chocolates were collected' })
   @IsArray()
-  chokolate_taked_ids: boolean[];
+  chokolate_taked: boolean[];
 
-  @ApiProperty({ example: [true, false] })
+  @ApiProperty({ example: [true, false], description: 'Array indicating which eggs were collected' })
   @IsArray()
-  eggs_taked_ids: boolean[];
+  eggs_taked: boolean[];
 
-  @ApiProperty({ example: [true] })
+  @ApiProperty({ example: [true], description: 'Array indicating which diamonds were collected' })
   @IsArray()
-  diamonds_taked_ids: boolean[];
+  diamonds_taked: boolean[];
 
-  @ApiProperty({ example: true, description: 'If level completed' })
+  @ApiProperty({ example: true, description: 'If level was completed' })
   @IsBoolean()
-  game_won: boolean;
+  level_won: boolean;
 
   @ApiProperty({ example: true, description: 'If level unlocked' })
   @IsBoolean()
   level_unlocked: boolean;
 
   @ApiProperty({
-    example: 'checkpoint_1',
-    description: 'Player checkpoint position name',
+    example: '',
+    description: 'Player checkpoint position name (empty string by default)',
   })
   @IsString()
   player_position_name: string;
