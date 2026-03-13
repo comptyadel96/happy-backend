@@ -6,11 +6,20 @@ import { PrismaService } from './prisma/prisma.service';
 import { DatabaseInitService } from './database/database-init.service';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { RedisIoAdapter } from './common/adapters/redis-io.adapter';
 import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-  // app.set('trust proxy', 1);
+
+  // Trust proxy - CRITICAL for Load Balancer (get real client IP)
+  (app as any).set('trust proxy', 1);
+
+  // Setup Redis Adapter for WebSocket scaling (CRITICAL for horizontal scaling)
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis();
+  app.useWebSocketAdapter(redisIoAdapter);
+
   // Security middleware
   app.use(helmet());
 
@@ -83,7 +92,7 @@ async function bootstrap() {
   });
 
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   console.log(`✅ Happy Backend is running on port ${port}`);
   console.log(`🎮 WebSocket server available on ws://localhost:${port}/game`);

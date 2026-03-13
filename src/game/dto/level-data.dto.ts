@@ -60,15 +60,24 @@ export class LevelDataDto {
   @Min(0)
   score: number;
 
-  @ApiProperty({ example: [true, true, false, false, true], description: 'Array indicating which chocolates were collected' })
+  @ApiProperty({
+    example: [true, true, false, false, true],
+    description: 'Array indicating which chocolates were collected',
+  })
   @IsArray()
   chokolate_taked: boolean[];
 
-  @ApiProperty({ example: [true, false], description: 'Array indicating which eggs were collected' })
+  @ApiProperty({
+    example: [true, false],
+    description: 'Array indicating which eggs were collected',
+  })
   @IsArray()
   eggs_taked: boolean[];
 
-  @ApiProperty({ example: [true], description: 'Array indicating which diamonds were collected' })
+  @ApiProperty({
+    example: [true],
+    description: 'Array indicating which diamonds were collected',
+  })
   @IsArray()
   diamonds_taked: boolean[];
 
