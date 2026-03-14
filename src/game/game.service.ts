@@ -117,7 +117,7 @@ export class GameService {
     }
 
     const levelsData = gameProfile.levelsData as any;
-    const levelKey = `level_${payload.levelId}`;
+    const levelKey = `${payload.levelId}`;
     const levelProgress = levelsData[levelKey] || {
       chokolate_collected: 0,
       eggs_collected: 0,
