@@ -47,7 +47,8 @@ model LevelData {
   levelId         Int      @unique
   levelName       String
   maxChocolates   Int      @default(30)
-  maxEggs         Int      @default(20)
+  maxDiamonds     Int      @default(2)
+  maxEggs         Int      @default(2)
   totalElements   Int
   difficulty      String   @default("normal")
   createdAt       DateTime @default(now())

@@ -5,47 +5,88 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // Create level data
+  // Create level data - Godot specs
   const levels = [
     {
       levelId: 1,
-      levelName: 'Garden Adventure',
+      levelName: 'Farm House',
       maxChocolates: 30,
-      maxEggs: 20,
-      totalElements: 50,
+      maxDiamonds: 2,
+      maxEggs: 2,
+      totalElements: 34,
       difficulty: 'easy',
     },
     {
       levelId: 2,
       levelName: 'Forest Quest',
-      maxChocolates: 35,
-      maxEggs: 25,
-      totalElements: 60,
-      difficulty: 'medium',
+      maxChocolates: 30,
+      maxDiamonds: 2,
+      maxEggs: 2,
+      totalElements: 34,
+      difficulty: 'easy',
     },
     {
       levelId: 3,
       levelName: 'Mountain Challenge',
-      maxChocolates: 40,
-      maxEggs: 30,
-      totalElements: 70,
-      difficulty: 'hard',
+      maxChocolates: 24,
+      maxDiamonds: 1,
+      maxEggs: 3,
+      totalElements: 28,
+      difficulty: 'medium',
     },
     {
       levelId: 4,
       levelName: 'Sky Journey',
-      maxChocolates: 30,
-      maxEggs: 25,
-      totalElements: 55,
+      maxChocolates: 36,
+      maxDiamonds: 1,
+      maxEggs: 1,
+      totalElements: 38,
       difficulty: 'medium',
     },
     {
       levelId: 5,
       levelName: 'Ocean Mystery',
-      maxChocolates: 35,
-      maxEggs: 30,
-      totalElements: 65,
+      maxChocolates: 20,
+      maxDiamonds: 1,
+      maxEggs: 2,
+      totalElements: 23,
       difficulty: 'hard',
+    },
+    {
+      levelId: 6,
+      levelName: 'Cave Adventure',
+      maxChocolates: 40,
+      maxDiamonds: 1,
+      maxEggs: 2,
+      totalElements: 43,
+      difficulty: 'hard',
+    },
+    {
+      levelId: 7,
+      levelName: 'Forest Deepness',
+      maxChocolates: 20,
+      maxDiamonds: 1,
+      maxEggs: 2,
+      totalElements: 23,
+      difficulty: 'hard',
+    },
+    {
+      levelId: 8,
+      levelName: 'Final Challenge',
+      maxChocolates: 40,
+      maxDiamonds: 1,
+      maxEggs: 2,
+      totalElements: 43,
+      difficulty: 'expert',
+    },
+    {
+      levelId: 9,
+      levelName: 'Ultimate Quest',
+      maxChocolates: 30,
+      maxDiamonds: 1,
+      maxEggs: 20,
+      totalElements: 51,
+      difficulty: 'expert',
     },
   ];
 
@@ -58,7 +99,7 @@ async function main() {
       await prisma.levelData.create({
         data: level,
       });
-      console.log(`✅ Created level: ${level.levelName}`);
+      console.log(`✅ Created level ${level.levelId}: ${level.levelName}`);
     }
   }
 

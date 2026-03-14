@@ -188,13 +188,13 @@ export class GameGateway
       userId,
       levelId: data.levelId,
       score: data.score,
-      totalScore: result.totalScore,
+      totalScore: result.newTotalScore,
     });
 
     client.emit('level_complete_success', {
       message: result.message,
-      totalScore: result.totalScore,
-      gameProfile: result.gameProfile,
+      totalScore: result.newTotalScore,
+      levelProgress: result.levelProgress,
     });
 
     return result;

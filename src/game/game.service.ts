@@ -53,33 +53,25 @@ export class GameService {
       return { success: false, error: 'Game profile not found' };
     }
 
-    const levelsData = gameProfile.levelsData as any;
+    const levelsData = gameProfile.levelsData as Record<string, any>;
     let totalChocolates = 0;
     let totalEggs = 0;
     let totalDiamonds = 0;
-    let totalStars = 0;
-    let totalCoins = 0;
     let completedLevels = 0;
 
     // Calculate totals from all levels
     Object.keys(levelsData).forEach((levelKey) => {
       const level = levelsData[levelKey];
-      if (level.chocolatesTaken) {
-        totalChocolates += level.chocolatesTaken.length;
+      if (level.chokolate_taked) {
+        totalChocolates += (level.chokolate_taked as number[]).length;
       }
-      if (level.eggsTaken) {
-        totalEggs += level.eggsTaken.length;
+      if (level.eggs_taked) {
+        totalEggs += (level.eggs_taked as number[]).length;
       }
-      if (level.diamondsTaken) {
-        totalDiamonds += level.diamondsTaken.length;
+      if (level.diamonds_taked) {
+        totalDiamonds += (level.diamonds_taked as number[]).length;
       }
-      if (level.starsTaken) {
-        totalStars += level.starsTaken.length;
-      }
-      if (level.coinsTaken) {
-        totalCoins += level.coinsTaken.length;
-      }
-      if (level.completed) {
+      if (level.level_won) {
         completedLevels += 1;
       }
     });
@@ -94,8 +86,6 @@ export class GameService {
         totalChocolates,
         totalEggs,
         totalDiamonds,
-        totalStars,
-        totalCoins,
         language: gameProfile.language,
         soundEnabled: gameProfile.soundEnabled,
         musicEnabled: gameProfile.musicEnabled,
@@ -129,38 +119,47 @@ export class GameService {
     const levelsData = gameProfile.levelsData as any;
     const levelKey = `level_${payload.levelId}`;
     const levelProgress = levelsData[levelKey] || {
-      chocolatesTaken: [],
-      eggsTaken: [],
-      diamondsTaken: [],
-      starsTaken: [],
-      coinsTaken: [],
+      chokolate_collected: 0,
+      eggs_collected: 0,
+      diamond_collected: 0,
+      time: 0,
+      score: 0,
+      level_won: false,
+      level_unlocked: false,
+      chokolate_taked: [],
+      eggs_taked: [],
+      diamonds_taked: [],
+      player_position_name: '',
+      happy_letters: { H: false, A: false, P: false, P2: false, Y: false },
     };
 
     // Try to get level-specific constraints from database
     let levelData = await this.getLevelData(payload.levelId);
 
     // In production, if level data is not found, return error
-    // This ensures levels are properly configured before accepting collection
     if (!levelData) {
       return { valid: false, error: 'Level not found' };
     }
 
-    const maxItems =
-      payload.itemType === 'chocolate'
-        ? levelData.maxChocolates
-        : levelData.maxEggs;
+    // Get max based on item type
+    let maxItems = 0;
+    if (payload.itemType === 'chocolate') {
+      maxItems = levelData.maxChocolates;
+    } else if (payload.itemType === 'egg') {
+      maxItems = levelData.maxEggs;
+    } else if (payload.itemType === 'diamond') {
+      maxItems = levelData.maxDiamonds;
+    }
 
     // Map item type to collected array
     const itemTypeMap = {
-      chocolate: 'chocolatesTaken',
-      egg: 'eggsTaken',
-      diamond: 'diamondsTaken',
-      star: 'starsTaken',
-      coin: 'coinsTaken',
+      chocolate: 'chokolate_taked',
+      egg: 'eggs_taked',
+      diamond: 'diamonds_taked',
     };
 
     const arrayKey = itemTypeMap[payload.itemType];
-    const currentArray = levelProgress[arrayKey] || [];
+    const currentArray = (levelProgress[arrayKey] as any[]) || [];
 
     // Check if item already collected
     if (currentArray.includes(payload.itemIndex)) {
@@ -203,40 +202,51 @@ export class GameService {
       return { valid: false, error: 'Game profile not found' };
     }
 
-    const levelsData = (gameProfile.levelsData as any) || {};
-    const levelKey = `level_${payload.levelId}`;
+    const levelsData = gameProfile.levelsData as Record<string, any>;
+    const levelKey = `${payload.levelId}`;
 
     // Initialize level progress if doesn't exist
     if (!levelsData[levelKey]) {
       levelsData[levelKey] = {
-        chocolatesTaken: [],
-        eggsTaken: [],
-        diamondsTaken: [],
-        starsTaken: [],
-        coinsTaken: [],
-        completed: false,
+        chokolate_collected: 0,
+        eggs_collected: 0,
+        diamond_collected: 0,
+        time: 0,
+        score: 0,
+        level_won: false,
+        level_unlocked: false,
+        chokolate_taked: [],
+        eggs_taked: [],
+        diamonds_taked: [],
+        player_position_name: '',
+        happy_letters: { H: false, A: false, P: false, P2: false, Y: false },
       };
     }
 
-    // Map item type to array and add item
-    const itemTypeMap = {
-      chocolate: 'chocolatesTaken',
-      egg: 'eggsTaken',
-      diamond: 'diamondsTaken',
-      star: 'starsTaken',
-      coin: 'coinsTaken',
+    // Map item type to array and increment counter
+    const itemTypeMapArray = {
+      chocolate: 'chokolate_taked',
+      egg: 'eggs_taked',
+      diamond: 'diamonds_taked',
     };
 
-    const arrayKey = itemTypeMap[payload.itemType];
-    levelsData[levelKey][arrayKey].push(payload.itemIndex);
+    const itemTypeMapCounter = {
+      chocolate: 'chokolate_collected',
+      egg: 'eggs_collected',
+      diamond: 'diamond_collected',
+    };
 
-    // Calculate points for collected item (optional reward system)
+    const arrayKey = itemTypeMapArray[payload.itemType] || 'chokolate_taked';
+    const counterKey = itemTypeMapCounter[payload.itemType] || 'chokolate_collected';
+
+    (levelsData[levelKey][arrayKey] as number[]).push(payload.itemIndex);
+    levelsData[levelKey][counterKey] = (levelsData[levelKey][counterKey] as number) + 1;
+
+    // Calculate points for collected item
     const itemPoints = {
       chocolate: 10,
       egg: 25,
       diamond: 100,
-      star: 50,
-      coin: 1,
     };
 
     const earnedPoints = itemPoints[payload.itemType] || 0;
@@ -262,7 +272,7 @@ export class GameService {
           itemType: payload.itemType,
           itemIndex: payload.itemIndex,
           earnedPoints,
-          totalItems: levelsData[levelKey][arrayKey].length,
+          totalItems: (levelsData[levelKey][arrayKey] as number[]).length,
         },
       },
     });
@@ -292,26 +302,31 @@ export class GameService {
       return { success: false, error: 'Level not found' };
     }
 
-    const levelsData = (gameProfile.levelsData as any) || {};
-    const levelKey = `level_${payload.levelId}`;
+    const levelsData = gameProfile.levelsData as Record<string, any>;
+    const levelKey = `${payload.levelId}`;
 
     // Initialize level if doesn't exist
     if (!levelsData[levelKey]) {
       levelsData[levelKey] = {
-        chocolatesTaken: [],
-        eggsTaken: [],
-        diamondsTaken: [],
-        starsTaken: [],
-        coinsTaken: [],
-        completed: false,
+        chokolate_collected: 0,
+        eggs_collected: 0,
+        diamond_collected: 0,
+        time: 0,
+        score: 0,
+        level_won: false,
+        level_unlocked: false,
+        chokolate_taked: [],
+        eggs_taked: [],
+        diamonds_taked: [],
+        player_position_name: '',
+        happy_letters: { H: false, A: false, P: false, P2: false, Y: false },
       };
     }
 
     // Mark level as completed
-    levelsData[levelKey].completed = true;
+    levelsData[levelKey].level_won = true;
     levelsData[levelKey].score = payload.score;
-    levelsData[levelKey].timeSpent = payload.timeSpent;
-    levelsData[levelKey].completedAt = new Date().toISOString();
+    levelsData[levelKey].time = payload.timeSpent;
 
     const newTotalScore = gameProfile.totalScore + payload.score;
 
@@ -343,8 +358,9 @@ export class GameService {
     return {
       success: true,
       message: 'Level completed successfully',
-      totalScore: newTotalScore,
-      gameProfile: updated,
+      score: payload.score,
+      newTotalScore,
+      levelProgress: levelsData[levelKey],
     };
   }
 
