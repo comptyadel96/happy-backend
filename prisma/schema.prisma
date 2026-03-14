@@ -2,8 +2,8 @@
 // MongoDB provider with comprehensive game state management
 
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {

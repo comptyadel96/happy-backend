@@ -13,6 +13,9 @@ RUN npm run build
 # ─── Stage 2: Production ──────────────────────────────────────────────────────
 FROM node:20-alpine AS production
 
+# Installation des libs de compatibilité pour Prisma sur Alpine
+RUN apk add --no-cache libc6-compat openssl
+
 WORKDIR /app
 
 # Only copy what's needed to run
@@ -33,4 +36,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health/redis', (r) => { if (r.statusCode !== 200) throw new Error(r.statusCode) })"
 
-CMD ["node", "dist/main.js"]
+# Commande flexible pour trouver le main.js peu importe la structure du dossier dist
+CMD ["sh", "-c", "node $(find dist -name main.js)"]
