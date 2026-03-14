@@ -237,10 +237,12 @@ export class GameService {
     };
 
     const arrayKey = itemTypeMapArray[payload.itemType] || 'chokolate_taked';
-    const counterKey = itemTypeMapCounter[payload.itemType] || 'chokolate_collected';
+    const counterKey =
+      itemTypeMapCounter[payload.itemType] || 'chokolate_collected';
 
     (levelsData[levelKey][arrayKey] as number[]).push(payload.itemIndex);
-    levelsData[levelKey][counterKey] = (levelsData[levelKey][counterKey] as number) + 1;
+    levelsData[levelKey][counterKey] =
+      (levelsData[levelKey][counterKey] as number) + 1;
 
     // Calculate points for collected item
     const itemPoints = {

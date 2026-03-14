@@ -86,7 +86,6 @@ export class GameGateway
     const userId = client.data.userId;
 
     if (userId) {
-
       // Update WebSocket connection record
       await this.prisma.webSocketConnection.updateMany({
         where: { socketId: client.id },
