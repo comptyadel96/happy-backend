@@ -51,8 +51,13 @@ export class AppController {
     description: 'Redis connection check completed',
     schema: {
       example: {
-        status: 'ok',
-        redis: '✅ Connected to Redis Cloud',
+        statusCode: 200,
+        message: 'Success',
+        data: {
+          status: 'ok',
+          redis: '✅ Connected to Redis Cloud',
+          instanceId: 'app1',
+        },
       },
     },
   })
@@ -61,16 +66,30 @@ export class AppController {
     description: 'Redis is unavailable (cache disabled)',
     schema: {
       example: {
-        status: 'ok',
-        redis: '❌ Redis unreachable',
+        statusCode: 200,
+        message: 'Success',
+        data: {
+          status: 'degraded',
+          redis: '❌ Redis unreachable',
+          instanceId: 'app1',
+        },
       },
     },
   })
-  async checkRedis(): Promise<{ status: string; redis: string }> {
+  async checkRedis(): Promise<{
+    statusCode: number;
+    message: string;
+    data: { status: string; redis: string; instanceId: string };
+  }> {
     const ok = await this.cacheService.ping();
     return {
-      status: ok ? 'ok' : 'degraded',
-      redis: ok ? '✅ Connected to Redis Cloud' : '❌ Redis unreachable',
+      statusCode: 200,
+      message: 'Success',
+      data: {
+        status: ok ? 'ok' : 'degraded',
+        redis: ok ? '✅ Connected to Redis Cloud' : '❌ Redis unreachable',
+        instanceId: process.env.INSTANCE_ID || 'unknown',
+      },
     };
   }
 }
