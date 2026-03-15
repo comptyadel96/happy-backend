@@ -1,49 +1,42 @@
 version: '3.8'
 
 services:
-  app3:
+  # ─── Instances du Serveur 1 ──────────────────────────────────────────────
+  app1:
     build: .
-    ports:
-      - '80:3000' # Port 80 pour l'instance 3
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: ${REDIS_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRATION: ${JWT_EXPIRATION}
-      NODE_ENV: ${NODE_ENV:-production}
-      PORT: 3000
-      INSTANCE_ID: app3
-      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     restart: unless-stopped
+    env_file: .env
+    environment:
+      - INSTANCE_ID=app1
+      - PORT=3000
     networks:
       - happy-network
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health/redis',(r)=>{if(r.statusCode!==200)throw new Error()})"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
 
-  app4:
+  app2:
     build: .
-    ports:
-      - '81:3000' # Port 81 pour l'instance 4
+    restart: unless-stopped
+    env_file: .env
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: ${REDIS_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRATION: ${JWT_EXPIRATION}
-      NODE_ENV: ${NODE_ENV:-production}
-      PORT: 3000
-      INSTANCE_ID: app4
-      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      - INSTANCE_ID=app2
+      - PORT=3000
+    networks:
+      - happy-network
+
+  # ─── Nginx (Indispensable sur le S1) ─────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro # Si tu as tes certifs SSL ici
+    depends_on:
+      - app1
+      - app2
     restart: unless-stopped
     networks:
       - happy-network
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health/redis',(r)=>{if(r.statusCode!==200)throw new Error()})"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
 
 networks:
   happy-network:

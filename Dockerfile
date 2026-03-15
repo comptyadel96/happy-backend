@@ -34,7 +34,6 @@ EXPOSE 3000
 
 # Health check hits the /health/redis endpoint we created
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/health/redis', (r) => { if (r.statusCode !== 200) throw new Error(r.statusCode) })"
-
+  CMD node -e "require('http').get('http://localhost:3000/health/redis', (r) => { if (r.statusCode !== 200) throw new E>
 # Commande flexible pour trouver le main.js peu importe la structure du dossier dist
 CMD ["sh", "-c", "node $(find dist -name main.js)"]
